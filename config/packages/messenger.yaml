@@ -1,0 +1,23 @@
+framework:
+    messenger:
+        default_bus: command.bus
+        buses:
+            handle.bus:
+                default_middleware: false
+                middleware:
+                    - 'handle_message'
+            command.bus:
+                default_middleware: false
+                middleware:
+                    - 'reject_redelivered_message_middleware'
+                    - 'amqp_with_id_middleware'
+                    - 'exchange_stamp_middleware'
+                    - 'send_message'
+        transports:
+            amqp:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                    max_retries: 0
+        routing:
+            MusicPlayground\Contract\Application\SongParser\Command\OnUpdateArtistCommand: amqp
+            MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumCommand: amqp

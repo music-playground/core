@@ -1,0 +1,10 @@
+<doctrine-mongo-mapping xmlns="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping
+                    http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd"
+>
+    <embedded-document name="App\Core\Domain\ValueObject\ArtistSource">
+        <field name="id" type="string" />
+        <field name="name" type="source" />
+    </embedded-document>
+</doctrine-mongo-mapping>

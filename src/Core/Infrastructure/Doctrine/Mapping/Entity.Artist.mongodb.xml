@@ -1,0 +1,24 @@
+<doctrine-mongo-mapping xmlns="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping
+                    http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd"
+>
+    <document name="App\Core\Domain\Entity\Artist" db="core" collection="artists">
+        <id />
+        <field field-name="name" type="string" />
+        <field field-name="avatarId" type="string" />
+        <field field-name="genres" type="collection" />
+        <embed-one target-document="App\Core\Domain\ValueObject\ArtistSource" field="source" />
+        <indexes>
+            <index unique="true">
+                <key name="source.name" />
+                <key name="source.id" />
+            </index>
+        </indexes>
+    </document>
+
+    <embedded-document name="App\Core\Domain\ValueObject\ArtistSource">
+        <field name="id" type="string" />
+        <field name="name" type="string" />
+    </embedded-document>
+</doctrine-mongo-mapping>

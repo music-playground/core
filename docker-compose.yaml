@@ -1,4 +1,16 @@
 services:
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - 27017:27017
+    volumes:
+      - /.docker-data/mp/core/mongo:/data/db
+    networks:
+      - service
   php:
     build:
       dockerfile: dev.Dockerfile
@@ -11,7 +23,10 @@ services:
       - "host.docker.internal:host-gateway"
     networks:
       - core
+      - service
 networks:
+  service:
+    driver: bridge
   core:
     name: music-playground-core
     external: true

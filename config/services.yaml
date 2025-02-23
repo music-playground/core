@@ -1,4 +1,6 @@
 parameters:
+    env(MONGODB_URL): ''
+    env(MONGODB_DB): ''
 
 services:
     _defaults:
@@ -31,3 +33,17 @@ services:
             $queues:
                 MusicPlayground\Contract\Application\SongParser\Command\OnUpdateArtistCommand: 'artists.on_update'
                 MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumCommand: 'albums.on_update'
+
+when@test:
+    services:
+        public.App\Core\Domain\Repository\ArtistRepositoryInterface:
+            alias: App\Core\Domain\Repository\ArtistRepositoryInterface
+            public: true
+        public.App\Shared\Domain\FlusherInterface:
+            alias: App\Shared\Domain\FlusherInterface
+            public: true
+        App\Tests\Core\Integration\Cleaner\CleanerInterface:
+            class: App\Tests\Core\Integration\Cleaner\MongoCleaner
+            public: true
+            arguments:
+                - '@Doctrine\ODM\MongoDB\DocumentManager'
