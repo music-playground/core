@@ -48,15 +48,13 @@ class Artist
         $this->name = $name;
     }
 
-    public function setAvatarUrl(string $avatarId): void
+    public function setAvatarId(string $avatarId): void
     {
         $this->avatarId = $avatarId;
     }
 
-    public function tryAddGenre(string $genre): void
+    public function setGenres(array $genres): void
     {
-        if (in_array($genre, $this->genres, true) === false) {
-            $this->genres[] = $genre;
-        }
+        $this->genres = $genres;
     }
 }

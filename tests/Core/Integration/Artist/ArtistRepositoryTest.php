@@ -11,11 +11,11 @@ use App\Core\Domain\ValueObject\ArtistSource;
 use App\Shared\Domain\FlusherInterface;
 use App\Shared\Domain\ValueObject\Pagination;
 use App\Tests\Core\Integration\Cleaner\CleanerInterface;
-use Exception;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use function PHPUnit\Framework\assertCount;
 use function PHPUnit\Framework\assertEquals;
+use function PHPUnit\Framework\assertNull;
 
 final class ArtistRepositoryTest extends KernelTestCase
 {
@@ -47,6 +47,8 @@ final class ArtistRepositoryTest extends KernelTestCase
     protected function tearDown(): void
     {
         $this->cleaner->clean([Artist::class]);
+
+        parent::tearDown();
     }
 
     /**
@@ -110,6 +112,22 @@ final class ArtistRepositoryTest extends KernelTestCase
         $this->repository->getById('nobody');
     }
 
+    public function test_find_by_source(): void
+    {
+        $artist = new Artist('CUPSIZE', 'afx12', new ArtistSource('ff1d6n', Source::Spotify));
+        $this->repository->save($artist);
+
+        $this->flusher->flush();
+
+        $savedArtist = $this->repository->findBySource($artist->getSource());
+
+        $this->assertArtists($artist, $savedArtist);
+
+        $null = $this->repository->findBySource(new ArtistSource('ff1d5p', Source::Spotify));
+
+        assertNull($null, 'Not wrote artist can`t be found');
+    }
+
     private function assertArtists(Artist $current, Artist $expected): void
     {
         assertEquals($expected->getId(), $current->getId());
@@ -126,7 +144,7 @@ final class ArtistRepositoryTest extends KernelTestCase
         assertEquals($expected->name, $current->getName());
         assertEquals($expected->source->name, $current->getSource()->getName());
         assertEquals($expected->source->id, $current->getSource()->getId());
-        assertEquals($expected->avatarId, $current->getAvatarId());
+        assertEquals($expected->avatar, $current->getAvatarId());
         assertEquals($expected->genres, $current->getGenres());
     }
 }

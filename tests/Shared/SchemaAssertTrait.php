@@ -12,7 +12,7 @@ trait SchemaAssertTrait
      * @throws Exception
      * @throws InvalidValue
      */
-    public function assertSchema(mixed $data, array $schema): void
+    public function assertSchema(object $data, object $schema): void
     {
         $schema = Schema::import($schema);
 

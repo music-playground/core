@@ -7,6 +7,7 @@ use App\Core\Domain\Entity\ArtistCast;
 use App\Core\Domain\Enum\SourceCast;
 use App\Core\Domain\Exception\ArtistNotFoundException;
 use App\Core\Domain\Repository\ArtistRepositoryInterface;
+use App\Core\Domain\ValueObject\ArtistSource;
 use App\Shared\Domain\Repository\LockMode;
 use App\Shared\Domain\ValueObject\Pagination;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -46,6 +47,15 @@ final readonly class MongoArtistRepository implements ArtistRepositoryInterface
     }
 
     /**
+     * @throws MappingException
+     * @throws LockException
+     */
+    public function findById(string $id, LockMode $lock = LockMode::NONE): ?Artist
+    {
+        return $this->repository->find($id);
+    }
+
+    /**
      * @throws ArtistNotFoundException
      * @throws MappingException
      * @throws LockException
@@ -59,6 +69,8 @@ final readonly class MongoArtistRepository implements ArtistRepositoryInterface
 
     public function getCastAll(Pagination $pagination): array
     {
+        if ($pagination->getCount() === 0) return [];
+
         $artists = $this->repository->findBy(
             [],
             ['id' => -1],
@@ -74,7 +86,7 @@ final readonly class MongoArtistRepository implements ArtistRepositoryInterface
      */
     public function count(): int
     {
-        return $this->dm->createQueryBuilder()->count()->getQuery()->execute();
+        return $this->repository->createQueryBuilder()->count()->getQuery()->execute();
     }
 
     /**
@@ -100,5 +112,13 @@ final readonly class MongoArtistRepository implements ArtistRepositoryInterface
             new SourceCast($source->getName(), $source->getId()),
             $artist->getGenres()
         );
+    }
+
+    public function findBySource(ArtistSource $source, LockMode $lock = LockMode::NONE): ?Artist
+    {
+        return $this->repository->createQueryBuilder()->addAnd(
+            ['source.name' => $source->getName()],
+            ['source.id' => $source->getId()]
+        )->getQuery()->getSingleResult();
     }
 }

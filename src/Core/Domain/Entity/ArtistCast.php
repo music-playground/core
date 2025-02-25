@@ -9,7 +9,7 @@ readonly class ArtistCast
     public function __construct(
         public string $id,
         public string $name,
-        public string $avatarId,
+        public string $avatar,
         public SourceCast $source,
         public array $genres
     ) {

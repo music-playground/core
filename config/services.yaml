@@ -1,6 +1,7 @@
 parameters:
     env(MONGODB_URL): ''
     env(MONGODB_DB): ''
+    api.max_limit_value: 100
 
 services:
     _defaults:
@@ -34,6 +35,10 @@ services:
                 MusicPlayground\Contract\Application\SongParser\Command\OnUpdateArtistCommand: 'artists.on_update'
                 MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumCommand: 'albums.on_update'
 
+    App\Core\Infrastructure\Controller\ArtistController:
+        arguments:
+            - '@App\Core\Domain\Repository\ArtistRepositoryInterface'
+            - '%api.max_limit_value%'
 when@test:
     services:
         public.App\Core\Domain\Repository\ArtistRepositoryInterface:

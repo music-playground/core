@@ -8,12 +8,14 @@ use App\Core\Domain\Exception\ArtistNotFoundException;
 use App\Core\Domain\Repository\ArtistRepositoryInterface;
 use App\Core\Domain\ValueObject\ArtistSource;
 use App\Shared\Domain\FlusherInterface;
+use App\Tests\Core\Integration\Cleaner\CleanerInterface;
 use App\Tests\Shared\SchemaAssertTrait;
 use Random\RandomException;
 use Swaggest\JsonSchema\Exception;
 use Swaggest\JsonSchema\InvalidValue;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use function PHPUnit\Framework\assertEquals;
 
 final class ArtistApiTest extends WebTestCase
 {
@@ -22,7 +24,7 @@ final class ArtistApiTest extends WebTestCase
     private KernelBrowser $client;
     private ArtistRepositoryInterface $repository;
     private FlusherInterface $flusher;
-    private string $imageUrl;
+    private CleanerInterface $cleaner;
 
     protected function setUp(): void
     {
@@ -32,11 +34,23 @@ final class ArtistApiTest extends WebTestCase
         $repository = $container->get(ArtistRepositoryInterface::class);
         /** @var FlusherInterface $flusher */
         $flusher = $container->get(FlusherInterface::class);
-        $imageUrl = $container->getParameter('image-url');
+        /** @var CleanerInterface $cleaner */
+        $cleaner = $container->get(CleanerInterface::class);
 
         $this->repository = $repository;
         $this->flusher = $flusher;
-        $this->imageUrl = $imageUrl;
+        $this->cleaner = $cleaner;
+
+        $this->cleaner->clean([Artist::class]);
+
+        parent::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->cleaner->clean([Artist::class]);
+
+        parent::tearDown();
     }
 
     /**
@@ -55,8 +69,8 @@ final class ArtistApiTest extends WebTestCase
         $this->client->request('GET', "/api/v1/artists/$id");
         $this->assertResponseIsSuccessful();
 
-        $body = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertSchema($body, $this->generateArtistSchema($artist, $id));
+        $body = json_decode($this->client->getResponse()->getContent());
+        $this->assertSchema($body, (object)$this->generateArtistSchema($artist));
 
         $this->repository->delete($id);
         $this->flusher->flush();
@@ -65,49 +79,99 @@ final class ArtistApiTest extends WebTestCase
 
         $this->assertResponseStatusCodeSame(404);
 
-        $body = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertSchema($body, ['error' => 'Artist not found', 'code' => 100]);
+        $body = json_decode($this->client->getResponse()->getContent());
+        $this->assertSchema($body, json_decode(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'error' => [ 'enum' => [ 'Artist not found' ] ],
+                'code' => [ 'enum' => [ 100 ] ]
+            ],
+            'required' => ['error', 'code']
+        ])));
     }
 
     /**
      * @throws Exception
      * @throws RandomException
      * @throws InvalidValue
+     * @dataProvider paginationProvider
      */
     public function test_get_many_endpoint(int $from, int $limit): void
     {
         $savedArtists = [];
-        $schema = [];
+        $schema = ['type' => 'object', 'items' => [ 'type' => 'array'], 'required' => [ 'count', 'items' ]];
 
         for ($i = 0; $i < $from + $limit + 1; $i++) {
-            $savedArtists[] = $this->repository->save(
-                new Artist("Artist$i", hash('md5', random_bytes(5)), new ArtistSource($i, Source::Spotify))
-            );
+            $artist = new Artist("Artist$i", hash('md5', random_bytes(5)), new ArtistSource($i, Source::Spotify));
+
+            $this->repository->save($artist);
+
+            $savedArtists[] = $artist;
         }
 
         $this->flusher->flush();
-        $schema['count'] = $this->repository->count();
+        $count = $this->repository->count();
 
-        for ($i = $from + $limit; $i >= $from; $i++)  {
-            $schema []= $this->generateArtistSchema($savedArtists[$i]);
+        $schema['properties']['count']['enum'] = [ $count ];
+
+        for ($i = $limit; $i >= $from; $i--)  {
+            $schema['properties']['items']['items'] []= $this->generateArtistSchema($savedArtists[$i]);
         }
 
         $this->client->request('GET', "/api/v1/artists?from=$from&limit=$limit");
 
         $this->assertResponseIsSuccessful();
-        $body = json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertSchema($body, $schema);
+        $body = json_decode($this->client->getResponse()->getContent());
+        $this->assertSchema($body, json_decode(json_encode($schema)));
     }
 
-    private function generateArtistSchema(Artist $artist): array
+    public function test_get_many_params_constrains(): void
     {
-        return [
-            'id' => $artist->getId(),
-            'name' => $artist->getName(),
-            'avatar' => $this->imageUrl . '/' . $artist->getAvatarId(),
-            'genres' => $artist->getGenres(),
-            'source' => $artist->getSource()
-        ];
+        $limit = $this->client->getContainer()->getParameter('api.max_limit_value');
+
+        for ($i = 0; $i < $limit + 1; $i++) {
+            $artist = new Artist("Artist$i", hash('md5', random_bytes(5)), new ArtistSource($i, Source::Spotify));
+
+            $this->repository->save($artist);
+        }
+
+        $this->flusher->flush();
+
+        $this->client->request('GET', '/api/v1/artists?limit=' . ($limit + 1));
+        $this->assertResponseIsSuccessful();
+        $body = json_decode($this->client->getResponse()->getContent(), true);
+
+        assertEquals($limit + 1, $body['count']);
+        assertEquals($limit, count($body['items']), 'Returned items count must be limited to parameter value');
+
+        $this->client->request('GET', '/api/v1/artists?limit=-1&from=-1');
+        $this->assertResponseIsSuccessful();
+        $body = json_decode($this->client->getResponse()->getContent(), true);
+
+        assertEquals($limit + 1, $body['count']);
+        assertEquals(0, count($body['items']), 'When limit param value is negative, its cast to 0');
+    }
+
+    private function generateArtistSchema(Artist $artist): object
+    {
+        return json_decode(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'id' => [ 'enum' => [ $artist->getId() ] ],
+                'name' => [ 'enum' => [ $artist->getName() ] ],
+                'avatar' => [ 'enum' => [ $artist->getAvatarId() ] ],
+                'genres' => [ 'type' => 'array', 'const' => $artist->getGenres() ],
+                'source' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'name' => [ 'enum' => [ $artist->getSource()->getName() ] ],
+                        'id' => [ 'enum' => [ $artist->getSource()->getId() ] ]
+                    ],
+                    'required' => ['name', 'id']
+                ]
+            ],
+            'required' => ['id', 'name', 'avatar', 'source', 'genres']
+        ]));
     }
 
     public static function artistsProvider(): array
@@ -115,6 +179,15 @@ final class ArtistApiTest extends WebTestCase
         return [
             [new Artist('LOV66', 'afd11', new ArtistSource('1', Source::Spotify))],
             [new Artist('Baby Melo', 'dzg1a', new ArtistSource('2', Source::Spotify))],
+        ];
+    }
+
+    public static function paginationProvider(): array
+    {
+        return [
+            [0, 5],
+            [1, 2],
+            [3, 1]
         ];
     }
 }
