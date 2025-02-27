@@ -11,7 +11,7 @@ services:
       - /.docker-data/mp/core/mongo:/data/db
     networks:
       - service
-  php:
+  core:
     build:
       dockerfile: dev.Dockerfile
       context: ./.docker/php
@@ -24,9 +24,26 @@ services:
     networks:
       - core
       - service
+  core-s3:
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+    volumes:
+      - /.docker-data/mp/core/localstack:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - SERVICES=s3
+      - PERSISTENCE=1
+    networks:
+      - core
+      - s3
 networks:
   service:
     driver: bridge
   core:
     name: music-playground-core
+    external: true
+  s3:
+    name: music-playground-s3
     external: true
