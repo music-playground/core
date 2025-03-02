@@ -4,7 +4,7 @@ namespace App\Core\Domain\ValueObject;
 
 use App\Core\Domain\Enum\Source;
 
-final readonly class ArtistSource
+final readonly class IdSource
 {
     public function __construct(
         private string $id,

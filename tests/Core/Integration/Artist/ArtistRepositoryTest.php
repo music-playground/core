@@ -7,7 +7,7 @@ use App\Core\Domain\Entity\ArtistCast;
 use App\Core\Domain\Enum\Source;
 use App\Core\Domain\Exception\ArtistNotFoundException;
 use App\Core\Domain\Repository\ArtistRepositoryInterface;
-use App\Core\Domain\ValueObject\ArtistSource;
+use App\Core\Domain\ValueObject\IdSource;
 use App\Shared\Domain\FlusherInterface;
 use App\Shared\Domain\ValueObject\Pagination;
 use App\Tests\Core\Integration\Cleaner\CleanerInterface;
@@ -56,16 +56,14 @@ final class ArtistRepositoryTest extends KernelTestCase
      */
     public function test_save_receive_and_delete(): void
     {
-        $artist = new Artist('etherfoun', 'afd6f', new ArtistSource('1', Source::Spotify));
+        $artist = new Artist('etherfoun', 'afd6f', new IdSource('1', Source::Spotify));
 
         $this->repository->save($artist);
         $this->flusher->flush();
 
         $savedArtist = $this->repository->getById($artist->getId());
-        $savedArtistCast = $this->repository->getCastById($artist->getId());
 
         $this->assertArtists($artist, $savedArtist);
-        $this->assertArtistAndCast($artist, $savedArtistCast);
 
         $this->repository->delete($artist->getId());
         $this->flusher->flush();
@@ -75,10 +73,32 @@ final class ArtistRepositoryTest extends KernelTestCase
         $this->repository->getById($artist->getId());
     }
 
+    /**
+     * @throws ArtistNotFoundException
+     */
+    public function test_cast_save_receive_and_delete(): void
+    {
+        $artist = new Artist('9mice', 'az41f', new IdSource('1', Source::Spotify));
+
+        $this->repository->save($artist);
+        $this->flusher->flush();
+
+        $cast = $this->repository->getCastById($artist->getId());
+
+        $this->assertArtistAndCast($artist, $cast);
+
+        $this->repository->delete($artist->getId());
+        $this->flusher->flush();
+
+        $this->expectException(ArtistNotFoundException::class);
+
+        $this->repository->getCastById($artist->getId());
+    }
+
     public function test_batch_save_and_get_all(): void
     {
-        $first = new Artist('etherfoun', 'afd6f', new ArtistSource('1', Source::Spotify));
-        $second = new Artist('OG Buda', 'dz561', new ArtistSource('2', Source::Spotify));
+        $first = new Artist('etherfoun', 'afd6f', new IdSource('1', Source::Spotify));
+        $second = new Artist('OG Buda', 'dz561', new IdSource('2', Source::Spotify));
 
         $this->repository->save($first);
         $this->repository->save($second);
@@ -94,8 +114,8 @@ final class ArtistRepositoryTest extends KernelTestCase
 
     public function test_duplicate_save(): void
     {
-        $first = new Artist('etherfoun1', 'afd6f', new ArtistSource('1', Source::Spotify));
-        $second = new Artist('etherfoun2', 'vz112', new ArtistSource('1', Source::Spotify));
+        $first = new Artist('etherfoun1', 'afd6f', new IdSource('1', Source::Spotify));
+        $second = new Artist('etherfoun2', 'vz112', new IdSource('1', Source::Spotify));
 
         $this->repository->save($first);
         $this->repository->save($second);
@@ -114,7 +134,7 @@ final class ArtistRepositoryTest extends KernelTestCase
 
     public function test_find_by_source(): void
     {
-        $artist = new Artist('CUPSIZE', 'afx12', new ArtistSource('ff1d6n', Source::Spotify));
+        $artist = new Artist('CUPSIZE', 'afx12', new IdSource('ff1d6n', Source::Spotify));
         $this->repository->save($artist);
 
         $this->flusher->flush();
@@ -123,7 +143,7 @@ final class ArtistRepositoryTest extends KernelTestCase
 
         $this->assertArtists($artist, $savedArtist);
 
-        $null = $this->repository->findBySource(new ArtistSource('ff1d5p', Source::Spotify));
+        $null = $this->repository->findBySource(new IdSource('ff1d5p', Source::Spotify));
 
         assertNull($null, 'Not wrote artist can`t be found');
     }

@@ -6,7 +6,7 @@ use App\Core\Domain\Entity\Artist;
 use App\Core\Domain\Enum\Source;
 use App\Core\Domain\Exception\ArtistNotFoundException;
 use App\Core\Domain\Repository\ArtistRepositoryInterface;
-use App\Core\Domain\ValueObject\ArtistSource;
+use App\Core\Domain\ValueObject\IdSource;
 use App\Shared\Domain\FlusherInterface;
 use App\Tests\Core\Integration\Cleaner\CleanerInterface;
 use App\Tests\Shared\SchemaAssertTrait;
@@ -99,10 +99,17 @@ final class ArtistApiTest extends WebTestCase
     public function test_get_many_endpoint(int $from, int $limit): void
     {
         $savedArtists = [];
-        $schema = ['type' => 'object', 'items' => [ 'type' => 'array'], 'required' => [ 'count', 'items' ]];
+        $schema = [
+            'type' => 'object',
+            'properties' => [
+                'items' => [ 'type' => 'array' ],
+                'count' => [ 'type' => 'int' ]
+            ],
+            'required' => [ 'count', 'items' ]
+        ];
 
         for ($i = 0; $i < $from + $limit + 1; $i++) {
-            $artist = new Artist("Artist$i", hash('md5', random_bytes(5)), new ArtistSource($i, Source::Spotify));
+            $artist = new Artist("Artist$i", hash('md5', random_bytes(5)), new IdSource($i, Source::Spotify));
 
             $this->repository->save($artist);
 
@@ -130,7 +137,7 @@ final class ArtistApiTest extends WebTestCase
         $limit = $this->client->getContainer()->getParameter('api.max_limit_value');
 
         for ($i = 0; $i < $limit + 1; $i++) {
-            $artist = new Artist("Artist$i", hash('md5', random_bytes(5)), new ArtistSource($i, Source::Spotify));
+            $artist = new Artist("Artist$i", hash('md5', random_bytes(5)), new IdSource($i, Source::Spotify));
 
             $this->repository->save($artist);
         }
@@ -177,8 +184,8 @@ final class ArtistApiTest extends WebTestCase
     public static function artistsProvider(): array
     {
         return [
-            [new Artist('LOV66', 'afd11', new ArtistSource('1', Source::Spotify))],
-            [new Artist('Baby Melo', 'dzg1a', new ArtistSource('2', Source::Spotify))],
+            [new Artist('LOV66', 'afd11', new IdSource('1', Source::Spotify))],
+            [new Artist('Baby Melo', 'dzg1a', new IdSource('2', Source::Spotify))],
         ];
     }
 

@@ -3,7 +3,7 @@
 namespace App\Core\Domain\Entity;
 
 
-use App\Core\Domain\ValueObject\ArtistSource;
+use App\Core\Domain\ValueObject\IdSource;
 
 class Artist
 {
@@ -14,7 +14,7 @@ class Artist
     public function __construct(
         private string $name,
         private string $avatarId,
-        private readonly ArtistSource $source
+        private readonly IdSource $source
     ) {
     }
 
@@ -33,7 +33,7 @@ class Artist
         return $this->avatarId;
     }
 
-    public function getSource(): ArtistSource
+    public function getSource(): IdSource
     {
         return $this->source;
     }

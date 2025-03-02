@@ -7,7 +7,7 @@ use App\Core\Domain\Entity\ArtistCast;
 use App\Core\Domain\Enum\SourceCast;
 use App\Core\Domain\Exception\ArtistNotFoundException;
 use App\Core\Domain\Repository\ArtistRepositoryInterface;
-use App\Core\Domain\ValueObject\ArtistSource;
+use App\Core\Domain\ValueObject\IdSource;
 use App\Shared\Domain\Repository\LockMode;
 use App\Shared\Domain\ValueObject\Pagination;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -114,7 +114,7 @@ final readonly class MongoArtistRepository implements ArtistRepositoryInterface
         );
     }
 
-    public function findBySource(ArtistSource $source, LockMode $lock = LockMode::NONE): ?Artist
+    public function findBySource(IdSource $source, LockMode $lock = LockMode::NONE): ?Artist
     {
         return $this->repository->createQueryBuilder()->addAnd(
             ['source.name' => $source->getName()],
