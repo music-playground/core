@@ -14,7 +14,7 @@ class Album
         private string $coverId,
         private readonly IdSource $source,
         private array $genres,
-        private array $authorsIds,
+        private array $artistsIds,
         private DateTimeImmutable $releaseDate
     ) {
     }
@@ -44,9 +44,9 @@ class Album
         return $this->genres;
     }
 
-    public function getAuthorsIds(): array
+    public function getArtistsIds(): array
     {
-        return $this->authorsIds;
+        return $this->artistsIds;
     }
 
     public function getReleaseDate(): DateTimeImmutable
@@ -71,8 +71,8 @@ class Album
 
     public function addAuthorId(string $id): void
     {
-        if (in_array($id, $this->authorsIds, true) === false) {
-            $this->authorsIds[] = $id;
+        if (in_array($id, $this->artistsIds, true) === false) {
+            $this->artistsIds[] = $id;
         }
     }
 

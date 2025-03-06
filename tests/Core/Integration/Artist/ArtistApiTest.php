@@ -102,14 +102,13 @@ final class ArtistApiTest extends WebTestCase
         $schema = [
             'type' => 'object',
             'properties' => [
-                'items' => [ 'type' => 'array' ],
-                'count' => [ 'type' => 'int' ]
+                'items' => [ 'type' => 'array' ]
             ],
             'required' => [ 'count', 'items' ]
         ];
 
         for ($i = 0; $i < $from + $limit + 1; $i++) {
-            $artist = new Artist("Artist$i", hash('md5', random_bytes(5)), new IdSource($i, Source::Spotify));
+            $artist = new Artist("Artist$i", new IdSource($i, Source::Spotify), md5(random_bytes(5)));
 
             $this->repository->save($artist);
 
@@ -132,12 +131,15 @@ final class ArtistApiTest extends WebTestCase
         $this->assertSchema($body, json_decode(json_encode($schema)));
     }
 
+    /**
+     * @throws RandomException
+     */
     public function test_get_many_params_constrains(): void
     {
         $limit = $this->client->getContainer()->getParameter('api.max_limit_value');
 
         for ($i = 0; $i < $limit + 1; $i++) {
-            $artist = new Artist("Artist$i", hash('md5', random_bytes(5)), new IdSource($i, Source::Spotify));
+            $artist = new Artist("Artist$i", new IdSource($i, Source::Spotify), md5(random_bytes(5)));
 
             $this->repository->save($artist);
         }
@@ -166,8 +168,6 @@ final class ArtistApiTest extends WebTestCase
             'properties' => [
                 'id' => [ 'enum' => [ $artist->getId() ] ],
                 'name' => [ 'enum' => [ $artist->getName() ] ],
-                'avatar' => [ 'enum' => [ $artist->getAvatarId() ] ],
-                'genres' => [ 'type' => 'array', 'const' => $artist->getGenres() ],
                 'source' => [
                     'type' => 'object',
                     'properties' => [
@@ -175,7 +175,9 @@ final class ArtistApiTest extends WebTestCase
                         'id' => [ 'enum' => [ $artist->getSource()->getId() ] ]
                     ],
                     'required' => ['name', 'id']
-                ]
+                ],
+                'genres' => [ 'type' => 'array', 'const' => $artist->getGenres() ],
+                'avatar' => [ 'enum' => [ $artist->getAvatarId() ] ]
             ],
             'required' => ['id', 'name', 'avatar', 'source', 'genres']
         ]));
@@ -184,8 +186,8 @@ final class ArtistApiTest extends WebTestCase
     public static function artistsProvider(): array
     {
         return [
-            [new Artist('LOV66', 'afd11', new IdSource('1', Source::Spotify))],
-            [new Artist('Baby Melo', 'dzg1a', new IdSource('2', Source::Spotify))],
+            [new Artist('LOV66', new IdSource('1', Source::Spotify), 'afd11')],
+            [new Artist('Baby Melo', new IdSource('2', Source::Spotify), 'dzg1a')],
         ];
     }
 

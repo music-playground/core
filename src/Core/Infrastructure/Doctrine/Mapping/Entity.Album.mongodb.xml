@@ -3,16 +3,21 @@
                         xsi:schemaLocation="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping
                     http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd"
 >
-    <document name="App\Core\Domain\Entity\Artist" db="core" collection="artists">
+    <document name="App\Core\Domain\Entity\Album" db="core" collection="albums">
         <id />
         <field field-name="name" type="string" />
-        <field field-name="avatarId" nullable="true" type="string" />
+        <field field-name="coverId" type="string" />
         <field field-name="genres" type="collection" />
         <embed-one target-document="App\Core\Domain\ValueObject\IdSource" field="source" />
+        <field field-name="artistsIds"  type="collection" />
+        <field field-name="releaseDate" type="date_immutable" />
         <indexes>
             <index unique="true">
                 <key name="source.name" />
                 <key name="source.id" />
+            </index>
+            <index>
+                <key name="artistsIds" />
             </index>
         </indexes>
     </document>

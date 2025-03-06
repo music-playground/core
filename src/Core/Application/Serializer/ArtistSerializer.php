@@ -14,8 +14,8 @@ class ArtistSerializer
     {
         return new Artist(
             $dto->name,
-            $dto->avatarId,
-            $this->sourceFromDTO($dto->source)
+            $this->sourceFromDTO($dto->source),
+            $dto->avatarId
         );
     }
 

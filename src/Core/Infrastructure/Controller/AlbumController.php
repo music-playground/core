@@ -2,8 +2,9 @@
 
 namespace App\Core\Infrastructure\Controller;
 
-use App\Core\Domain\Exception\ArtistNotFoundException;
-use App\Core\Domain\Repository\ArtistRepositoryInterface;
+use App\Core\Domain\Exception\AlbumNotFoundException;
+use App\Core\Domain\Repository\AlbumRepositoryInterface;
+use App\Core\Domain\Repository\SearchParams;
 use App\Shared\Domain\ValueObject\Pagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -11,11 +12,11 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route(path: '/api/v1/artists')]
-final class ArtistController extends AbstractController
+#[Route(path: '/api/v1/albums')]
+final class AlbumController extends AbstractController
 {
     public function __construct(
-        private readonly ArtistRepositoryInterface $repository,
+        private readonly AlbumRepositoryInterface $repository,
         private readonly int $maxLimitValue
     ) {
     }
@@ -24,27 +25,29 @@ final class ArtistController extends AbstractController
     public function getById(string $id): JsonResponse
     {
         try {
-            $artist = $this->repository->getCastById($id);
-        } catch (ArtistNotFoundException) {
-            throw new HttpException(404, 'Artist not found', code: 100);
+            return $this->json($this->repository->getCastById($id));
+        } catch (AlbumNotFoundException) {
+            throw new HttpException(404, 'Album not found', code: 200);
         }
-
-        return $this->json($artist);
     }
 
-    #[Route(methods: 'GET')]
+    #[Route(path: '/', methods: 'GET')]
     public function getMany(
         #[MapQueryParameter(filter: FILTER_VALIDATE_INT)] ?int $limit = null,
         #[MapQueryParameter(filter: FILTER_VALIDATE_INT)] ?int $from = null,
-    ): JsonResponse {
+        #[MapQueryParameter] ?string $ids = null,
+        #[MapQueryParameter] ?string $artistId = null
+    ): JsonResponse
+    {
         $pagination = new Pagination(
             min(max($limit ?? $this->maxLimitValue, 0), $this->maxLimitValue),
             max($from ?? 0, 0)
         );
+        $searchParams = new SearchParams($artistId, $ids ? explode(',', $ids) : null);
 
-        return $this->json([
-            'count' => $this->repository->count(),
-            'items' => $this->repository->getCastAll($pagination)
+            return $this->json([
+            'count' => $this->repository->count($searchParams),
+            'items' => $this->repository->getCastAll($pagination, $searchParams)
         ]);
     }
 }

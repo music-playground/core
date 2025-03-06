@@ -10,10 +10,10 @@ readonly class AlbumCast
     public function __construct(
         public string $id,
         public string $name,
-        public string $coverId,
-        public SourceCast $source,
+        public string $cover,
         public array $genres,
-        public DateTimeImmutable $releaseDate,
+        public SourceCast $source,
+        public string $releaseDate,
         /** @var ArtistShortCast[] */
         public array $artists
     ) {

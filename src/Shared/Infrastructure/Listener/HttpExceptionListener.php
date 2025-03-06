@@ -2,12 +2,15 @@
 
 namespace App\Shared\Infrastructure\Listener;
 
+use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
+#[When('prod')]
+#[When('test')]
 #[AsEventListener(event: 'kernel.exception', priority: 100)]
 class HttpExceptionListener
 {

@@ -86,7 +86,7 @@ final readonly class MongoArtistRepository implements ArtistRepositoryInterface
      */
     public function count(): int
     {
-        return $this->repository->createQueryBuilder()->count()->getQuery()->execute();
+        return $this->repository->createQueryBuilder()->find()->count()->getQuery()->execute();
     }
 
     /**
@@ -108,9 +108,9 @@ final readonly class MongoArtistRepository implements ArtistRepositoryInterface
         return new ArtistCast(
             $artist->getId(),
             $artist->getName(),
-            $artist->getAvatarId(),
             new SourceCast($source->getName(), $source->getId()),
-            $artist->getGenres()
+            $artist->getGenres(),
+            $artist->getAvatarId()
         );
     }
 

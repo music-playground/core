@@ -56,7 +56,7 @@ final class ArtistRepositoryTest extends KernelTestCase
      */
     public function test_save_receive_and_delete(): void
     {
-        $artist = new Artist('etherfoun', 'afd6f', new IdSource('1', Source::Spotify));
+        $artist = new Artist('etherfoun', new IdSource('1', Source::Spotify), 'afd6f');
 
         $this->repository->save($artist);
         $this->flusher->flush();
@@ -78,7 +78,7 @@ final class ArtistRepositoryTest extends KernelTestCase
      */
     public function test_cast_save_receive_and_delete(): void
     {
-        $artist = new Artist('9mice', 'az41f', new IdSource('1', Source::Spotify));
+        $artist = new Artist('9mice', new IdSource('1', Source::Spotify), 'az41f');
 
         $this->repository->save($artist);
         $this->flusher->flush();
@@ -97,8 +97,8 @@ final class ArtistRepositoryTest extends KernelTestCase
 
     public function test_batch_save_and_get_all(): void
     {
-        $first = new Artist('etherfoun', 'afd6f', new IdSource('1', Source::Spotify));
-        $second = new Artist('OG Buda', 'dz561', new IdSource('2', Source::Spotify));
+        $first = new Artist('etherfoun', new IdSource('1', Source::Spotify), 'afd6f');
+        $second = new Artist('OG Buda', new IdSource('2', Source::Spotify), 'dz561');
 
         $this->repository->save($first);
         $this->repository->save($second);
@@ -114,8 +114,8 @@ final class ArtistRepositoryTest extends KernelTestCase
 
     public function test_duplicate_save(): void
     {
-        $first = new Artist('etherfoun1', 'afd6f', new IdSource('1', Source::Spotify));
-        $second = new Artist('etherfoun2', 'vz112', new IdSource('1', Source::Spotify));
+        $first = new Artist('etherfoun1', new IdSource('1', Source::Spotify), 'afd6f');
+        $second = new Artist('etherfoun2', new IdSource('1', Source::Spotify), 'vz112');
 
         $this->repository->save($first);
         $this->repository->save($second);
@@ -134,7 +134,7 @@ final class ArtistRepositoryTest extends KernelTestCase
 
     public function test_find_by_source(): void
     {
-        $artist = new Artist('CUPSIZE', 'afx12', new IdSource('ff1d6n', Source::Spotify));
+        $artist = new Artist('CUPSIZE', new IdSource('ff1d6n', Source::Spotify), 'afx12');
         $this->repository->save($artist);
 
         $this->flusher->flush();

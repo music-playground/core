@@ -3,7 +3,7 @@
                         xsi:schemaLocation="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping
                     http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd"
 >
-    <embedded-document name="App\Core\Domain\ValueObject\ArtistSource">
+    <embedded-document name="App\Core\Domain\ValueObject\IdSource">
         <field name="id" type="string" />
         <field name="name" type="source" />
     </embedded-document>

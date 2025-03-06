@@ -9,9 +9,9 @@ readonly class ArtistCast
     public function __construct(
         public string $id,
         public string $name,
-        public string $avatar,
         public SourceCast $source,
-        public array $genres
+        public array $genres,
+        public ?string $avatar = null
     ) {
     }
 }

@@ -7,7 +7,7 @@ readonly class ArtistShortCast
     public function __construct(
         public string $id,
         public string $name,
-        public string $avatarId
+        public ?string $avatarId
     ) {
     }
 }

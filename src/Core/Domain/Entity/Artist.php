@@ -13,8 +13,8 @@ class Artist
 
     public function __construct(
         private string $name,
-        private string $avatarId,
-        private readonly IdSource $source
+        private readonly IdSource $source,
+        private ?string $avatarId = null
     ) {
     }
 
@@ -28,7 +28,7 @@ class Artist
         return $this->name;
     }
 
-    public function getAvatarId(): string
+    public function getAvatarId(): ?string
     {
         return $this->avatarId;
     }

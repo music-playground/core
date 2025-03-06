@@ -73,7 +73,7 @@ final class AlbumRepositoryTest extends KernelTestCase
 
         $this->assertAlbums($album, $savedAlbum);
 
-        $this->repository->delete($savedAlbum);
+        $this->repository->delete($savedAlbum->getId());
         $this->flusher->flush();
 
         $this->expectException(AlbumNotFoundException::class);
@@ -87,8 +87,8 @@ final class AlbumRepositoryTest extends KernelTestCase
     public function test_cast_save_get_and_delete(): void
     {
         $artists = [
-            new Artist('Kizaru', '1xd3fb', new IdSource('1', Source::Spotify)),
-            new Artist('Big Baby Tape', '1bdf3z', new IdSource('1', Source::Spotify))
+            new Artist('Kizaru', new IdSource('1', Source::Spotify), '1xd3fb'),
+            new Artist('Big Baby Tape', new IdSource('2', Source::Spotify), '1bdf3z')
         ];
         $album = new Album('Bandana I', '1ffdz', new IdSource('1', Source::Spotify), ['rap'], [], new DateTimeImmutable());
 
@@ -99,7 +99,7 @@ final class AlbumRepositoryTest extends KernelTestCase
 
         $this->assertAlbumAndCast($album, $artists, $cast);
 
-        $this->repository->delete($album);
+        $this->repository->delete($album->getId());
         $this->flusher->flush();
 
         $this->expectException(AlbumNotFoundException::class);
@@ -112,22 +112,20 @@ final class AlbumRepositoryTest extends KernelTestCase
         $albums = [];
 
         for ($albumIndex = 0; $albumIndex < 10; $albumIndex++) {
-            $albums[$albumIndex][0] = [
-                new Album(
-                    "Album $albumIndex",
-                    random_bytes(5),
-                    new IdSource($albumIndex, Source::Spotify),
-                    [$albumIndex],
-                    [],
-                    new DateTimeImmutable()
-                )
-            ];
+            $albums[$albumIndex][0] = new Album(
+                "Album $albumIndex",
+                md5(random_bytes(5)),
+                new IdSource($albumIndex, Source::Spotify),
+                [$albumIndex],
+                [],
+                new DateTimeImmutable()
+            );
 
             for ($artistIndex = 0; $artistIndex < $albumIndex + 1; $artistIndex++) {
                 $albums[$albumIndex][1][] = new Artist(
                     "Artist $albumIndex.$artistIndex",
-                    random_bytes(5),
                     new IdSource("$albumIndex.$artistIndex", Source::Spotify),
+                    md5(random_bytes(5))
                 );
             }
 
@@ -138,18 +136,18 @@ final class AlbumRepositoryTest extends KernelTestCase
 
         $casts = $this->repository->getCastAll(new Pagination(3, 1));
 
-        for ($i = 3; $i >= 1; $i--) {
-            [$album, $artist] = $albums[$i];
+        for ($i = 0; $i < 3; $i++) {
+            [$album, $artist] = $albums[count($albums) - 2 - $i];
 
             $this->assertAlbumAndCast($album, $artist, array_shift($casts));
         }
 
-        assertCount(3, $casts);
+        assertCount(0, $casts);
         assertEquals(10, $this->repository->count());
 
-
+        $a = $albums[0][1][0]->getId();
         $artistsCasts = $this->repository->getCastAll(
-            new Pagination(0, 0), new SearchParams(artistId: $albums[0][1][0]->getId())
+            new Pagination(1, 0), new SearchParams(artistId: $a)
         );
 
         assertCount(1, $artistsCasts);
@@ -167,7 +165,7 @@ final class AlbumRepositoryTest extends KernelTestCase
 
         $this->assertAlbums($album, $found);
 
-        $this->repository->delete($album);
+        $this->repository->delete($album->getId());
         $this->flusher->flush();
 
         assertNull($this->repository->findBySource($album->getSource()), 'Not existed source can`t be found in repository');
@@ -228,9 +226,9 @@ final class AlbumRepositoryTest extends KernelTestCase
         assertEquals($current->getGenres(), $expected->genres);
         assertEquals($current->getSource()->getName(), $expected->source->name);
         assertEquals($current->getSource()->getId(), $expected->source->id);
-        assertEquals($current->getReleaseDate(), $expected->releaseDate);
+        assertEquals($current->getReleaseDate()->format('Y-m-d'), $expected->releaseDate);
         assertEquals($current->getGenres(), $expected->genres);
-        assertEquals($current->getCoverId(), $expected->coverId);
+        assertEquals($current->getCoverId(), $expected->cover);
 
         for ($i = 0; $i < count($artists); $i++) {
             assertEquals($artists[$i]->getId(), $expected->artists[$i]->id);
