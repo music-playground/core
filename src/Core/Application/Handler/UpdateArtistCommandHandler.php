@@ -36,9 +36,10 @@ final readonly class UpdateArtistCommandHandler
             $artist->setAvatarId($artistData->avatarId);
         } else {
             $artist = $this->serializer->fromDTO($artistData);
+
+            $this->repository->save($artist);
         }
 
-        $this->repository->save($artist);
         $this->flusher->flush();
 
         $containsAlbums = $this->albumRepository->findIdsByAuthor($artist->getId());

@@ -1013,12 +1013,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:music-playground/contracts.git",
-                "reference": "2041be0f82f50cc1d15f6f928964e6392390311d"
+                "reference": "6a0e3554770c72668da5e533db948821953b3877"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/music-playground/contracts/zipball/2041be0f82f50cc1d15f6f928964e6392390311d",
-                "reference": "2041be0f82f50cc1d15f6f928964e6392390311d",
+                "url": "https://api.github.com/repos/music-playground/contracts/zipball/6a0e3554770c72668da5e533db948821953b3877",
+                "reference": "6a0e3554770c72668da5e533db948821953b3877",
                 "shasum": ""
             },
             "default-branch": true,
@@ -1039,7 +1039,7 @@
                 "source": "https://github.com/music-playground/contracts/tree/main",
                 "issues": "https://github.com/music-playground/contracts/issues"
             },
-            "time": "2025-02-24T17:48:32+00:00"
+            "time": "2025-03-06T12:40:25+00:00"
         },
         {
             "name": "psr/cache",

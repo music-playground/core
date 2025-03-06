@@ -8,15 +8,17 @@ use DateTimeImmutable;
 class Album
 {
     private ?string $id = null;
+    private array $artistsIds = [];
 
     public function __construct(
         private string $name,
         private string $coverId,
         private readonly IdSource $source,
         private array $genres,
-        private array $artistsIds,
+        array $artistsIds,
         private DateTimeImmutable $releaseDate
     ) {
+        array_walk($artistsIds, fn (string $id) => $this->addAuthorId($id));
     }
 
     public function getId(): string
