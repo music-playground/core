@@ -4,7 +4,7 @@
                     http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd"
 >
     <embedded-document name="App\Core\Domain\ValueObject\IdSource">
-        <field name="id" type="string" />
-        <field name="name" type="source" />
+        <field name="id" type="id_source" />
+        <field name="name" type="string" />
     </embedded-document>
 </doctrine-mongo-mapping>

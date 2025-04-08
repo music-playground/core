@@ -4,7 +4,6 @@ namespace App\Core\Infrastructure\Doctrine\Repository;
 
 use App\Core\Domain\Entity\Artist;
 use App\Core\Domain\Entity\ArtistCast;
-use App\Core\Domain\Enum\SourceCast;
 use App\Core\Domain\Exception\ArtistNotFoundException;
 use App\Core\Domain\Repository\ArtistRepositoryInterface;
 use App\Core\Domain\ValueObject\IdSource;
@@ -108,17 +107,18 @@ final readonly class MongoArtistRepository implements ArtistRepositoryInterface
         return new ArtistCast(
             $artist->getId(),
             $artist->getName(),
-            new SourceCast($source->getName(), $source->getId()),
+            (string)$source,
             $artist->getGenres(),
             $artist->getAvatarId()
         );
     }
 
+    /**
+     * @throws MappingException
+     * @throws LockException
+     */
     public function findBySource(IdSource $source, LockMode $lock = LockMode::NONE): ?Artist
     {
-        return $this->repository->createQueryBuilder()->addAnd(
-            ['source.name' => $source->getName()],
-            ['source.id' => $source->getId()]
-        )->getQuery()->getSingleResult();
+        return $this->repository->find(['source' => (string)$source]);
     }
 }

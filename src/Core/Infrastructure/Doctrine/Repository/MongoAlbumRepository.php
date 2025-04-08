@@ -4,15 +4,16 @@ namespace App\Core\Infrastructure\Doctrine\Repository;
 
 use App\Core\Domain\Entity\Album;
 use App\Core\Domain\Entity\AlbumCast;
+use App\Core\Domain\Entity\Artist;
 use App\Core\Domain\Entity\ArtistShortCast;
-use App\Core\Domain\Enum\SourceCast;
 use App\Core\Domain\Exception\AlbumNotFoundException;
+use App\Core\Domain\Exception\ArtistNotFoundException;
 use App\Core\Domain\Repository\AlbumRepositoryInterface;
+use App\Core\Domain\Repository\ArtistRepositoryInterface;
 use App\Core\Domain\Repository\SearchParams;
 use App\Core\Domain\ValueObject\IdSource;
 use App\Shared\Domain\Repository\LockMode;
 use App\Shared\Domain\ValueObject\Pagination;
-use DateTimeImmutable;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\MatchStage;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -25,8 +26,10 @@ final readonly class MongoAlbumRepository implements AlbumRepositoryInterface
 {
     private DocumentRepository $repository;
 
-    public function __construct(private DocumentManager $dm)
-    {
+    public function __construct(
+        private DocumentManager $dm,
+        private ArtistRepositoryInterface $artistRepository
+    ) {
         $this->repository = $this->dm->getRepository(Album::class);
     }
 
@@ -69,6 +72,9 @@ final readonly class MongoAlbumRepository implements AlbumRepositoryInterface
         return $this->castFromArray($album);
     }
 
+    /**
+     * @throws ArtistNotFoundException
+     */
     public function getCastAll(Pagination $pagination, ?SearchParams $params = null): array
     {
         if ($pagination->getCount() === 0) {
@@ -92,6 +98,7 @@ final readonly class MongoAlbumRepository implements AlbumRepositoryInterface
 
     /**
      * @throws MongoDBException
+     * @throws ArtistNotFoundException
      */
     public function count(?SearchParams $params = null): int
     {
@@ -105,17 +112,20 @@ final readonly class MongoAlbumRepository implements AlbumRepositoryInterface
     public function findBySource(IdSource $source, LockMode $lock = LockMode::NONE): ?Album
     {
         return $this->repository->findOneBy([
-            'source.id' => $source->getId(),
-            'source.name' => $source->getName()
+            'source' => $source->getName() . ':' . $source->getId(),
         ]);
     }
 
+    /**
+     * @throws ArtistNotFoundException
+     */
     public function findIdsByAuthor(string $authorId): array
     {
+        $artist = $this->artistRepository->getById($authorId);
         $result = $this->repository->createAggregationBuilder()
             ->match()
-            ->field('artistsIds')
-            ->equals($authorId)
+            ->field('artists.source')
+            ->equals((string)$artist->getSource())
             ->getAggregation()
             ->getIterator()
             ->toArray();
@@ -135,6 +145,9 @@ final readonly class MongoAlbumRepository implements AlbumRepositoryInterface
         $this->dm->remove($album);
     }
 
+    /**
+     * @throws ArtistNotFoundException
+     */
     private function pushSearchParams(
         MatchStage|\Doctrine\ODM\MongoDB\Query\Builder $match, ?SearchParams $searchParams
     ): void {
@@ -143,19 +156,18 @@ final readonly class MongoAlbumRepository implements AlbumRepositoryInterface
         }
 
         if ($searchParams?->artistId !== null) {
-            $match->field('artistsIds')->equals($searchParams->artistId);
+            $artist = $this->artistRepository->getById($searchParams->artistId);
+
+            $match->field('artists.source')->equals((string)$artist->getSource());
         }
     }
 
     private function pushArtistsLookup(Builder $builder): void
     {
         $builder
-            ->set()
-                ->field('artistsIds')
-                ->map('$artistsIds', 'id', ['$toObjectId' => '$$id'])
             ->lookup('artists')
-                ->localField('artistsIds')
-                ->foreignField('_id')
+                ->localField('artists.source')
+                ->foreignField('source')
                 ->pipeline([
                     [ '$project' => [ '_id' => 1, 'name' => 1, 'avatarId' => 1 ] ]
                 ])
@@ -169,7 +181,7 @@ final readonly class MongoAlbumRepository implements AlbumRepositoryInterface
             $params['name'],
             $params['coverId'],
             $params['genres'],
-            new SourceCast($params['source']['name'], $params['source']['id']),
+            $params['source'],
             $params['releaseDate']->toDateTime()->format('Y-m-d'),
             array_map(fn ($artist) => new ArtistShortCast(
                 (string)$artist['_id'], $artist['name'], $artist['avatarId']),

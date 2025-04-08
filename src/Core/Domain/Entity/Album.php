@@ -4,21 +4,22 @@ namespace App\Core\Domain\Entity;
 
 use App\Core\Domain\ValueObject\IdSource;
 use DateTimeImmutable;
+use InvalidArgumentException;
 
 class Album
 {
     private ?string $id = null;
-    private array $artistsIds = [];
+    /** @var SimpleArtist[] */
+    private $artists = [];
 
     public function __construct(
         private string $name,
         private string $coverId,
         private readonly IdSource $source,
         private array $genres,
-        array $artistsIds,
+        /** @var SimpleArtist[] */
         private DateTimeImmutable $releaseDate
     ) {
-        array_walk($artistsIds, fn (string $id) => $this->addAuthorId($id));
     }
 
     public function getId(): string
@@ -46,11 +47,6 @@ class Album
         return $this->genres;
     }
 
-    public function getArtistsIds(): array
-    {
-        return $this->artistsIds;
-    }
-
     public function getReleaseDate(): DateTimeImmutable
     {
         return $this->releaseDate;
@@ -71,10 +67,18 @@ class Album
         $this->genres = $genres;
     }
 
-    public function addAuthorId(string $id): void
+    /** @var SimpleArtist[] $artists */
+    public function setSimpleArtists(array $artists): void
     {
-        if (in_array($id, $this->artistsIds, true) === false) {
-            $this->artistsIds[] = $id;
+        $this->artists = [];
+        $ids = array_map(fn (SimpleArtist $artist) => $artist->getSource()->getId(), $artists);
+
+        if (array_unique($ids) !== $ids) {
+            throw new InvalidArgumentException('Duplicate artist found');
+        }
+
+        foreach ($artists as $artist) {
+            $this->artists []= $artist;
         }
     }
 

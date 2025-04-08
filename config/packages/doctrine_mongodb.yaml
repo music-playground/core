@@ -16,7 +16,7 @@ doctrine_mongodb:
                     dir: '%kernel.project_dir%/src/Core/Infrastructure/Doctrine/Mapping'
                     prefix: 'App\Core\Domain'
     types:
-        source: App\Core\Infrastructure\Doctrine\Type\SourceType
+        id_source: App\Core\Infrastructure\Doctrine\Type\IdSourceType
 when@prod:
     doctrine_mongodb:
         auto_generate_proxy_classes: false

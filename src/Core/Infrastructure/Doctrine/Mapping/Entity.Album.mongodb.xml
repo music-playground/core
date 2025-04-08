@@ -8,16 +8,12 @@
         <field field-name="name" type="string" />
         <field field-name="coverId" type="string" />
         <field field-name="genres" type="collection" />
-        <embed-one target-document="App\Core\Domain\ValueObject\IdSource" field="source" />
-        <field field-name="artistsIds"  type="collection" />
+        <field field-name="source" type="id_source" />
+        <embed-many target-document="App\Core\Domain\Entity\SimpleArtist" field="artists" />
         <field field-name="releaseDate" type="date_immutable" />
         <indexes>
             <index unique="true">
-                <key name="source.name" />
-                <key name="source.id" />
-            </index>
-            <index>
-                <key name="artistsIds" />
+                <key name="source" />
             </index>
         </indexes>
     </document>

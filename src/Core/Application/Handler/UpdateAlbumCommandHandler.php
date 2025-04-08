@@ -3,6 +3,7 @@
 namespace App\Core\Application\Handler;
 
 use App\Core\Application\Serializer\AlbumSerializer;
+use App\Core\Application\Serializer\ArtistSerializer;
 use App\Core\Domain\Entity\Album;
 use App\Core\Domain\Repository\AlbumRepositoryInterface;
 use App\Shared\Application\Interface\CommandBusInterface;
@@ -18,38 +19,38 @@ final readonly class UpdateAlbumCommandHandler
         private AlbumRepositoryInterface $repository,
         private FlusherInterface $flusher,
         private AlbumSerializer $serializer,
-        private CommandBusInterface $bus
+        private CommandBusInterface $bus,
+        private ArtistSerializer $artistSerializer
     ) {
     }
 
     public function __invoke(UpdateAlbumCommand $command): void
     {
-        $data = $command->dto;
+        $albumData = $command->dto;
         $album = $this->repository->findBySource(
-            $this->serializer->sourceFromDTO($data->source)
+            $this->serializer->sourceFromDTO($albumData->source)
         );
 
         if ($album !== null) {
             $this->updateAlbum($album, $command);
         } else {
-            $album = $this->serializer->fromDTO($command->dto);
-            $album->addAuthorId($command->artistId);
+            $album = $this->serializer->fromDTO($albumData);
 
             $this->repository->save($album);
         }
 
         $this->flusher->flush();
-        $this->bus->dispatch(new OnUpdateAlbumCommand($command->dto->source, $command->dto->artist->source, []));
+        $this->bus->dispatch(new OnUpdateAlbumCommand($albumData->source, []));
     }
 
     private function updateAlbum(Album $album, UpdateAlbumCommand $command): void
     {
-        $dto = $command->dto;
+        $albumData = $command->dto;
 
-        $album->setName($dto->name);
-        $album->setCoverId($dto->cover);
-        $album->setGenres($dto->genres);
-        $album->addAuthorId($command->artistId);
-        $album->setReleaseDate($dto->releaseDate);
+        $album->setName($albumData->name);
+        $album->setCoverId($albumData->cover);
+        $album->setGenres($albumData->genres);
+        $album->setSimpleArtists($this->artistSerializer->manySimpleFroDTO($albumData->artists));
+        $album->setReleaseDate($albumData->releaseDate);
     }
 }

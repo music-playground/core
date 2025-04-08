@@ -12,7 +12,7 @@ readonly class AlbumCast
         public string $name,
         public string $cover,
         public array $genres,
-        public SourceCast $source,
+        public string $source,
         public string $releaseDate,
         /** @var ArtistShortCast[] */
         public array $artists

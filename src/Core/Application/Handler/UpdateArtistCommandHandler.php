@@ -43,6 +43,6 @@ final readonly class UpdateArtistCommandHandler
         $this->flusher->flush();
 
         $containsAlbums = $this->albumRepository->findIdsByAuthor($artist->getId());
-        $this->bus->dispatch(new OnUpdateArtistCommand($artistData->source, $artist->getId(), $containsAlbums));
+        $this->bus->dispatch(new OnUpdateArtistCommand($artistData->source, $containsAlbums));
     }
 }

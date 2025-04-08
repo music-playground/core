@@ -3,16 +3,8 @@
                         xsi:schemaLocation="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping
                     http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd"
 >
-    <document name="App\Core\Domain\Entity\Artist" db="core" collection="artists">
-        <id />
-        <field field-name="name" type="string" />
-        <field field-name="avatarId" nullable="true" type="string" />
-        <field field-name="genres" type="collection" />
+    <embedded-document name="App\Core\Domain\Entity\SimpleArtist">
+        <field name="name" type="string" />
         <field field-name="source" type="id_source" />
-        <indexes>
-            <index unique="true">
-                <key name="source" />
-            </index>
-        </indexes>
-    </document>
+    </embedded-document>
 </doctrine-mongo-mapping>
