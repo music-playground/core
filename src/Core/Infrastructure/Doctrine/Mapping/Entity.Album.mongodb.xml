@@ -15,6 +15,9 @@
             <index unique="true">
                 <key name="source" />
             </index>
+            <index>
+                <key name="artists.source" />
+            </index>
         </indexes>
     </document>
 </doctrine-mongo-mapping>

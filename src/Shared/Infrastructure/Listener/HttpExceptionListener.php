@@ -18,11 +18,12 @@ class HttpExceptionListener
     {
         $exception = $event->getThrowable();
         $httpException = $exception instanceof HttpExceptionInterface ? $exception
-            : new HttpException(500, 'Internal server error');
+            : new HttpException(500, 'Internal server error', $exception);
 
         $event->setResponse(new JsonResponse(
             array_filter(['error' => $httpException->getMessage(), 'code' => $httpException->getCode()]),
-            $httpException->getStatusCode()
+            $httpException->getStatusCode(),
+            ['Content-Type' => 'application/problem+json']
         ));
     }
 }

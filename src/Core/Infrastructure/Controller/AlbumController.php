@@ -21,14 +21,13 @@ final class AlbumController extends AbstractController
     ) {
     }
 
+    /**
+     * @throws AlbumNotFoundException
+     */
     #[Route(path: '/{id}', methods: 'GET')]
     public function getById(string $id): JsonResponse
     {
-        try {
-            return $this->json($this->repository->getCastById($id));
-        } catch (AlbumNotFoundException) {
-            throw new HttpException(404, 'Album not found', code: 200);
-        }
+        return $this->json($this->repository->getCastById($id));
     }
 
     #[Route(path: '/', methods: 'GET')]
