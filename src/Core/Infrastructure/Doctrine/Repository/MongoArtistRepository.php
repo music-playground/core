@@ -6,6 +6,7 @@ use App\Core\Domain\Entity\Artist;
 use App\Core\Domain\Entity\ArtistCast;
 use App\Core\Domain\Exception\ArtistNotFoundException;
 use App\Core\Domain\Repository\ArtistRepositoryInterface;
+use App\Core\Domain\ValueObject\ArtistAvatar;
 use App\Core\Domain\ValueObject\IdSource;
 use App\Shared\Domain\Repository\LockMode;
 use App\Shared\Domain\ValueObject\Pagination;
@@ -109,7 +110,7 @@ final readonly class MongoArtistRepository implements ArtistRepositoryInterface
             $artist->getName(),
             (string)$source,
             $artist->getGenres(),
-            $artist->getAvatarId()
+            new ArtistAvatar($artist->getAvatarId())
         );
     }
 

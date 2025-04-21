@@ -2,7 +2,7 @@
 
 namespace App\Core\Domain\Entity;
 
-use App\Core\Domain\Enum\SourceCast;
+use App\Core\Domain\ValueObject\ArtistAvatar;
 
 readonly class ArtistCast
 {
@@ -11,7 +11,7 @@ readonly class ArtistCast
         public string $name,
         public string $source,
         public array $genres,
-        public ?string $avatar = null
+        public ?ArtistAvatar $avatar = null
     ) {
     }
 }

@@ -47,6 +47,11 @@ services:
         arguments:
             - '@App\Core\Domain\Repository\Track\TrackRepositoryInterface'
             - '%api.max_limit_value%'
+
+    App\Core\Infrastructure\Normalizer\FileIdNormalizer:
+        arguments:
+            - '%env(FILE_SERVICE_HOST)%'
+
 when@test:
     services:
         App\Tests\Core\Fixtures\AlbumFixture:

@@ -9,6 +9,7 @@ use App\Core\Domain\Exception\ArtistNotFoundException;
 use App\Core\Domain\Repository\Album\AlbumRepositoryInterface;
 use App\Core\Domain\Repository\Album\SearchParams;
 use App\Core\Domain\Repository\ArtistRepositoryInterface;
+use App\Core\Domain\ValueObject\AlbumCover;
 use App\Core\Domain\ValueObject\IdSource;
 use App\Core\Infrastructure\Util\ShortArtistsFactory;
 use App\Shared\Domain\Repository\LockMode;
@@ -174,7 +175,7 @@ final readonly class MongoAlbumRepository implements AlbumRepositoryInterface
         return new AlbumCast(
             (string)$params['_id'],
             $params['name'],
-            $params['coverId'],
+            new AlbumCover($params['coverId']),
             $params['genres'],
             $params['source'],
             $params['releaseDate']->toDateTime()->format('Y-m-d'),

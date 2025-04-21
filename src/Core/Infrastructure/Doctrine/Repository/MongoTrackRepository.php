@@ -9,6 +9,9 @@ use App\Core\Domain\Entity\TrackCast;
 use App\Core\Domain\Exception\TrackNotFoundException;
 use App\Core\Domain\Repository\Track\SearchParams;
 use App\Core\Domain\Repository\Track\TrackRepositoryInterface;
+use App\Core\Domain\ValueObject\AlbumCover;
+use App\Core\Domain\ValueObject\ArtistAvatar;
+use App\Core\Domain\ValueObject\Audio;
 use App\Core\Domain\ValueObject\IdSource;
 use App\Shared\Domain\Repository\LockMode;
 use App\Shared\Domain\ValueObject\Pagination;
@@ -147,10 +150,14 @@ final readonly class MongoTrackRepository implements TrackRepositoryInterface
         return new TrackCast(
             $params['_id'],
             $params['name'],
-            $params['fileId'],
+            new Audio($params['fileId']),
             $params['source'],
             array_map(
-                fn (array $artist) => new ArtistShortCast($artist['_id'], $artist['name'], $artist['avatarId']),
+                fn (array $artist) => new ArtistShortCast(
+                    $artist['_id'],
+                    $artist['name'],
+                    $artist['avatarId'] ? new ArtistAvatar($artist['avatarId']) : null
+                ),
                 $params['artists']
             ),
             $this->createAlbumShortCastByArray($params['album'][0])
@@ -175,6 +182,6 @@ final readonly class MongoTrackRepository implements TrackRepositoryInterface
 
     private function createAlbumShortCastByArray(array $params): AlbumShortCast
     {
-        return new AlbumShortCast($params['_id'], $params['name'], $params['coverId']);
+        return new AlbumShortCast($params['_id'], $params['name'], new AlbumCover($params['coverId']));
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Core\Infrastructure\Util;
 
 use App\Core\Domain\Entity\ArtistShortCast;
+use App\Core\Domain\ValueObject\ArtistAvatar;
 
 class ShortArtistsFactory
 {
@@ -17,7 +18,10 @@ class ShortArtistsFactory
 
         return array_map(function (array $artist) use ($existingMap) {
             $artist = $existingMap[$artist['source']] ?? $artist;
-            return new ArtistShortCast($artist['name'], $artist['_id'] ?? null, $artist['avatarId'] ?? null);
+            return new ArtistShortCast(
+                $artist['name'],
+                $artist['_id'] ?? null,
+                $artist['avatarId'] ? new ArtistAvatar($artist['avatarId']) : null);
         },  $all);
     }
 }
