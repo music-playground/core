@@ -6,8 +6,8 @@ class AlbumShortCast
 {
     public function __construct(
         public string $id,
-        public string $coverId,
-        public string $name
+        public string $name,
+        public ?string $coverId
     ) {
     }
 }

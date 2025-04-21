@@ -113,12 +113,8 @@ final readonly class MongoArtistRepository implements ArtistRepositoryInterface
         );
     }
 
-    /**
-     * @throws MappingException
-     * @throws LockException
-     */
     public function findBySource(IdSource $source, LockMode $lock = LockMode::NONE): ?Artist
     {
-        return $this->repository->find(['source' => (string)$source]);
+        return $this->repository->findOneBy(['source' => $source]);
     }
 }

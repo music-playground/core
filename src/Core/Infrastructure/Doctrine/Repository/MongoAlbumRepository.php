@@ -4,14 +4,13 @@ namespace App\Core\Infrastructure\Doctrine\Repository;
 
 use App\Core\Domain\Entity\Album;
 use App\Core\Domain\Entity\AlbumCast;
-use App\Core\Domain\Entity\Artist;
-use App\Core\Domain\Entity\ArtistShortCast;
 use App\Core\Domain\Exception\AlbumNotFoundException;
 use App\Core\Domain\Exception\ArtistNotFoundException;
-use App\Core\Domain\Repository\AlbumRepositoryInterface;
+use App\Core\Domain\Repository\Album\AlbumRepositoryInterface;
+use App\Core\Domain\Repository\Album\SearchParams;
 use App\Core\Domain\Repository\ArtistRepositoryInterface;
-use App\Core\Domain\Repository\SearchParams;
 use App\Core\Domain\ValueObject\IdSource;
+use App\Core\Infrastructure\Util\ShortArtistsFactory;
 use App\Shared\Domain\Repository\LockMode;
 use App\Shared\Domain\ValueObject\Pagination;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
@@ -28,7 +27,8 @@ final readonly class MongoAlbumRepository implements AlbumRepositoryInterface
 
     public function __construct(
         private DocumentManager $dm,
-        private ArtistRepositoryInterface $artistRepository
+        private ArtistRepositoryInterface $artistRepository,
+        private ShortArtistsFactory $shortArtistsFactory
     ) {
         $this->repository = $this->dm->getRepository(Album::class);
     }
@@ -111,9 +111,7 @@ final readonly class MongoAlbumRepository implements AlbumRepositoryInterface
 
     public function findBySource(IdSource $source, LockMode $lock = LockMode::NONE): ?Album
     {
-        return $this->repository->findOneBy([
-            'source' => $source->getName() . ':' . $source->getId(),
-        ]);
+        return $this->repository->findOneBy(['source' => $source]);
     }
 
     /**
@@ -130,7 +128,7 @@ final readonly class MongoAlbumRepository implements AlbumRepositoryInterface
             ->getIterator()
             ->toArray();
 
-        return array_map(fn (array $album) => $album['_id'], $result);
+        return array_map(fn (array $album) => (string)$album['_id'], $result);
     }
 
     /**
@@ -168,10 +166,7 @@ final readonly class MongoAlbumRepository implements AlbumRepositoryInterface
             ->lookup('artists')
                 ->localField('artists.source')
                 ->foreignField('source')
-                ->pipeline([
-                    [ '$project' => [ '_id' => 1, 'name' => 1, 'avatarId' => 1 ] ]
-                ])
-                ->alias('artists');
+                ->alias('existingArtists');
     }
 
     private function castFromArray(array $params): AlbumCast
@@ -183,10 +178,7 @@ final readonly class MongoAlbumRepository implements AlbumRepositoryInterface
             $params['genres'],
             $params['source'],
             $params['releaseDate']->toDateTime()->format('Y-m-d'),
-            array_map(fn ($artist) => new ArtistShortCast(
-                (string)$artist['_id'], $artist['name'], $artist['avatarId']),
-                $params['artists']
-            )
+            $this->shortArtistsFactory->create($params['artists'], $params['existingArtists'])
         );
     }
 }

@@ -21,3 +21,4 @@ framework:
         routing:
             MusicPlayground\Contract\Application\SongParser\Command\OnUpdateArtistCommand: amqp
             MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumCommand: amqp
+            MusicPlayground\Contract\Application\SongParser\Command\UpdateTrackCommand: amqp

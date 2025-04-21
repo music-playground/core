@@ -5,7 +5,7 @@ namespace App\Core\Application\Handler;
 use App\Core\Application\Serializer\AlbumSerializer;
 use App\Core\Application\Serializer\ArtistSerializer;
 use App\Core\Domain\Entity\Album;
-use App\Core\Domain\Repository\AlbumRepositoryInterface;
+use App\Core\Domain\Repository\Album\AlbumRepositoryInterface;
 use App\Shared\Application\Interface\CommandBusInterface;
 use App\Shared\Domain\FlusherInterface;
 use MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumCommand;
@@ -40,7 +40,7 @@ final readonly class UpdateAlbumCommandHandler
         }
 
         $this->flusher->flush();
-        $this->bus->dispatch(new OnUpdateAlbumCommand($albumData->source, []));
+        $this->bus->dispatch(new OnUpdateAlbumCommand($album->getId(), $albumData->source, []));
     }
 
     private function updateAlbum(Album $album, UpdateAlbumCommand $command): void

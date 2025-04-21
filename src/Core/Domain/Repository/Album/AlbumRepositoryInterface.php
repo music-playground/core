@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\Domain\Repository;
+namespace App\Core\Domain\Repository\Album;
 
 use App\Core\Domain\Entity\Album;
 use App\Core\Domain\Entity\AlbumCast;

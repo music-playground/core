@@ -41,7 +41,11 @@ services:
             - '%api.max_limit_value%'
     App\Core\Infrastructure\Controller\AlbumController:
         arguments:
-            - '@App\Core\Domain\Repository\AlbumRepositoryInterface'
+            - '@App\Core\Domain\Repository\Album\AlbumRepositoryInterface'
+            - '%api.max_limit_value%'
+    App\Core\Infrastructure\Controller\TrackController:
+        arguments:
+            - '@App\Core\Domain\Repository\Track\TrackRepositoryInterface'
             - '%api.max_limit_value%'
 when@test:
     services:

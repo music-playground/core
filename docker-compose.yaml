@@ -2,6 +2,8 @@ services:
   mongo:
     image: mongo
     restart: always
+    profiles:
+      - service
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
@@ -14,9 +16,7 @@ services:
   core:
     build:
       dockerfile: dev.Dockerfile
-      context: ./.docker/php
-    ports:
-      - 8000:8000
+      context: .docker/php
     volumes:
       - .:/app
     extra_hosts:
@@ -25,19 +25,77 @@ services:
       - core
       - service
   core-s3:
-    image: localstack/localstack:latest
+    image: minio/minio:latest
+    profiles:
+      - service
     ports:
-      - "4566:4566"
+      - "4566:9000"
+      - "9001:9001"
     volumes:
-      - /.docker-data/mp/core/localstack:/var/lib/localstack
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /.docker_data/mp/core/s3:/data
     environment:
-      - DOCKER_HOST=unix:///var/run/docker.sock
-      - SERVICES=s3
-      - PERSISTENCE=1
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: rootrootrootroot
+    command: server /data --console-address ":9001"
     networks:
       - core
       - s3
+  core-web:
+    extends:
+      service: core
+    profiles:
+      - service
+    ports:
+      - 8000:8000
+    entrypoint: ["php", "-S", "0.0.0.0:8000", "-t", "public"]
+  core-worker-1:
+    restart: always
+    profiles:
+      - workers
+    extends:
+      service: core
+    command: >
+      php bin/console messenger:consume amqp
+      --queues=artists.update.1
+      --queues=albums.update.1
+      --queues=tracks.update.1
+      --bus=handle.bus -vv -f 10 --time-limit=300
+  core-worker-2:
+    restart: always
+    profiles:
+      - workers
+    extends:
+      service: core
+    command: >
+      php bin/console messenger:consume amqp
+      --queues=artists.update.2
+      --queues=albums.update.2
+      --queues=tracks.update.2
+      --bus=handle.bus -vv -f 10 --time-limit=300
+  core-worker-3:
+    restart: always
+    profiles:
+      - workers
+    extends:
+      service: core
+    command: >
+      php bin/console messenger:consume amqp
+      --queues=artists.update.3
+      --queues=albums.update.3
+      --queues=tracks.update.3
+      --bus=handle.bus -vv -f 10 --time-limit=300
+  core-worker-4:
+    restart: always
+    profiles:
+      - workers
+    extends:
+      service: core
+    command: >
+      php bin/console messenger:consume amqp
+      --queues=artists.update.4
+      --queues=albums.update.4
+      --queues=tracks.update.4
+      --bus=handle.bus -vv -f 10 --time-limit=300
 networks:
   service:
     driver: bridge

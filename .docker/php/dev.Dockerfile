@@ -41,5 +41,3 @@ COPY xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 ENV PHP_IDE_CONFIG "serverName=Docker"
 ENV XDEBUG_MODE "debug"
 ENV XDEBUG_CONFIG "client_host=host.docker.internal client_port=9999"
-
-CMD ["php", "-S", "0.0.0.0:8000", "-t", "public"]

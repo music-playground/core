@@ -4,7 +4,7 @@ namespace App\Tests\Core\Integration\Album;
 
 use App\Core\Domain\Entity\Album;
 use App\Core\Domain\Entity\Artist;
-use App\Core\Domain\Repository\AlbumRepositoryInterface;
+use App\Core\Domain\Repository\Album\AlbumRepositoryInterface;
 use App\Shared\Domain\FlusherInterface;
 use App\Shared\Infrastructure\Util\Query;
 use App\Tests\Core\Integration\Cleaner\CleanerInterface;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\Domain\Repository;
+namespace App\Core\Domain\Repository\Album;
 
 final readonly class SearchParams
 {

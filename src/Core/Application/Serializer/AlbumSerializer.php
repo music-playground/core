@@ -7,7 +7,6 @@ use App\Core\Domain\Enum\Source;
 use App\Core\Domain\ValueObject\IdSource;
 use MusicPlayground\Contract\Application\SongParser\DTO\AlbumDTO;
 use MusicPlayground\Contract\Application\SongParser\DTO\AlbumSourceDTO;
-use MusicPlayground\Contract\Application\SongParser\DTO\SimpleArtistDTO;
 
 final readonly class AlbumSerializer
 {

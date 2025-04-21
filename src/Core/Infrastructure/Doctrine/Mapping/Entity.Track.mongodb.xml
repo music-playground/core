@@ -1,0 +1,19 @@
+<doctrine-mongo-mapping xmlns="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping
+                    http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd"
+>
+    <document name="App\Core\Domain\Entity\Track" db="core" collection="tracks">
+        <id />
+        <field field-name="name" type="string" />
+        <field field-name="fileId" type="string" />
+        <field field-name="albumId" type="object_id" />
+        <field field-name="source" type="id_source" />
+        <embed-many target-document="App\Core\Domain\Entity\SimpleArtist" field="artists" />
+        <indexes>
+            <index unique="false">
+                <key name="albumId" />
+            </index>
+        </indexes>
+    </document>
+</doctrine-mongo-mapping>
