@@ -8,7 +8,9 @@ use DateTimeImmutable;
 
 class Album
 {
-    use SimpleArtistsTrait;
+    use SimpleArtistsTrait {
+        init as simpleArtistsInit;
+    }
 
     private ?string $id = null;
 
@@ -19,6 +21,7 @@ class Album
         private array $genres,
         private DateTimeImmutable $releaseDate
     ) {
+        $this->simpleArtistsInit();
     }
 
     public function getId(): string

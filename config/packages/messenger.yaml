@@ -22,3 +22,4 @@ framework:
             MusicPlayground\Contract\Application\SongParser\Command\OnUpdateArtistCommand: amqp
             MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumCommand: amqp
             MusicPlayground\Contract\Application\SongParser\Command\UpdateTrackCommand: amqp
+            MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumFullCommand: amqp

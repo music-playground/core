@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\Domain\Repository;
+namespace App\Core\Domain\Repository\Artist;
 
 use App\Core\Domain\Entity\Artist;
 use App\Core\Domain\Entity\ArtistCast;
@@ -22,7 +22,7 @@ interface ArtistRepositoryInterface
     public function getCastById(string $id): ArtistCast;
 
     /** @return ArtistCast[] */
-    public function getCastAll(Pagination $pagination): array;
+    public function getCastAll(Pagination $pagination, ?SearchParams $params = null): array;
 
     public function count(): int;
 

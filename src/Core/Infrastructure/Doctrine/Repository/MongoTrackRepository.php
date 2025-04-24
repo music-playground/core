@@ -107,6 +107,22 @@ final readonly class MongoTrackRepository implements TrackRepositoryInterface
     /**
      * @throws MongoDBException
      */
+    public function getAllNamesByAlbumId(string $albumId): array
+    {
+        $builder = $this->repository->createQueryBuilder();
+
+        return $builder->find(Track::class)
+            ->field('albumId')
+                ->equals($albumId)
+            ->select('name')
+            ->getQuery()
+            ->execute()
+            ->toArray();
+    }
+
+    /**
+     * @throws MongoDBException
+     */
     public function count(?SearchParams $searchParams = null): int
     {
         $query = $this->repository->createQueryBuilder();

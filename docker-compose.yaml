@@ -35,7 +35,7 @@ services:
       - /.docker_data/mp/core/s3:/data
     environment:
       MINIO_ROOT_USER: root
-      MINIO_ROOT_PASSWORD: rootrootrootroot
+      MINIO_ROOT_PASSWORD: rootpassword
     command: server /data --console-address ":9001"
     networks:
       - core

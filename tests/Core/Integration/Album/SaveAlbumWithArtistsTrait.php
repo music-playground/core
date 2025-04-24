@@ -4,7 +4,7 @@ namespace App\Tests\Core\Integration\Album;
 
 use App\Core\Domain\Entity\Album;
 use App\Core\Domain\Repository\Album\AlbumRepositoryInterface;
-use App\Core\Domain\Repository\ArtistRepositoryInterface;
+use App\Core\Domain\Repository\Artist\ArtistRepositoryInterface;
 use App\Shared\Domain\FlusherInterface;
 
 trait SaveAlbumWithArtistsTrait

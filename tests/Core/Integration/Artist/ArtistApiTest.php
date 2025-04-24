@@ -5,7 +5,7 @@ namespace App\Tests\Core\Integration\Artist;
 use App\Core\Domain\Entity\Artist;
 use App\Core\Domain\Enum\Source;
 use App\Core\Domain\Exception\ArtistNotFoundException;
-use App\Core\Domain\Repository\ArtistRepositoryInterface;
+use App\Core\Domain\Repository\Artist\ArtistRepositoryInterface;
 use App\Core\Domain\ValueObject\IdSource;
 use App\Shared\Domain\FlusherInterface;
 use App\Tests\Core\Integration\Cleaner\CleanerInterface;

@@ -8,7 +8,7 @@ use App\Core\Domain\Exception\AlbumNotFoundException;
 use App\Core\Domain\Exception\ArtistNotFoundException;
 use App\Core\Domain\Repository\Album\AlbumRepositoryInterface;
 use App\Core\Domain\Repository\Album\SearchParams;
-use App\Core\Domain\Repository\ArtistRepositoryInterface;
+use App\Core\Domain\Repository\Artist\ArtistRepositoryInterface;
 use App\Core\Domain\ValueObject\AlbumCover;
 use App\Core\Domain\ValueObject\IdSource;
 use App\Core\Infrastructure\Util\ShortArtistsFactory;

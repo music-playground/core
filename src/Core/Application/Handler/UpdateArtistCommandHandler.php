@@ -4,7 +4,7 @@ namespace App\Core\Application\Handler;
 
 use App\Core\Application\Serializer\ArtistSerializer;
 use App\Core\Domain\Repository\Album\AlbumRepositoryInterface;
-use App\Core\Domain\Repository\ArtistRepositoryInterface;
+use App\Core\Domain\Repository\Artist\ArtistRepositoryInterface;
 use App\Shared\Application\Interface\CommandBusInterface;
 use App\Shared\Domain\FlusherInterface;
 use MusicPlayground\Contract\Application\SongParser\Command\OnUpdateArtistCommand;

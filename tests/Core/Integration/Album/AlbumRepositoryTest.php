@@ -9,7 +9,7 @@ use App\Core\Domain\Enum\Source;
 use App\Core\Domain\Exception\AlbumNotFoundException;
 use App\Core\Domain\Repository\Album\AlbumRepositoryInterface;
 use App\Core\Domain\Repository\Album\SearchParams;
-use App\Core\Domain\Repository\ArtistRepositoryInterface;
+use App\Core\Domain\Repository\Artist\ArtistRepositoryInterface;
 use App\Core\Domain\ValueObject\IdSource;
 use App\Shared\Domain\FlusherInterface;
 use App\Shared\Domain\ValueObject\Pagination;

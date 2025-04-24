@@ -5,7 +5,8 @@ namespace App\Core\Infrastructure\Doctrine\Repository;
 use App\Core\Domain\Entity\Artist;
 use App\Core\Domain\Entity\ArtistCast;
 use App\Core\Domain\Exception\ArtistNotFoundException;
-use App\Core\Domain\Repository\ArtistRepositoryInterface;
+use App\Core\Domain\Repository\Artist\ArtistRepositoryInterface;
+use App\Core\Domain\Repository\Artist\SearchParams;
 use App\Core\Domain\ValueObject\ArtistAvatar;
 use App\Core\Domain\ValueObject\IdSource;
 use App\Shared\Domain\Repository\LockMode;
@@ -67,12 +68,12 @@ final readonly class MongoArtistRepository implements ArtistRepositoryInterface
         return $this->artistToCast($artist);
     }
 
-    public function getCastAll(Pagination $pagination): array
+    public function getCastAll(Pagination $pagination, ?SearchParams $params = null): array
     {
         if ($pagination->getCount() === 0) return [];
 
         $artists = $this->repository->findBy(
-            [],
+            $params?->sources !== null ? ['source' => ['$in' => $params->sources]] : [],
             ['id' => -1],
             $pagination->getCount(),
             $pagination->getFrom()

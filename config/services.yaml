@@ -28,16 +28,21 @@ services:
                     delivery_mode: 2
                     headers:
                         requeue: true
+                MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumFullCommand:
+                    delivery_mode: 2
+                    headers:
+                        requeue: true
     exchange_stamp_middleware:
         class: 'MusicPlayground\AmqpTransport\Messenger\Middleware\AmqpExchangeStampMiddleware'
         arguments:
             $queues:
                 MusicPlayground\Contract\Application\SongParser\Command\OnUpdateArtistCommand: 'artists.on_update'
                 MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumCommand: 'albums.on_update'
+                MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumFullCommand: 'albums.on_update_full'
 
     App\Core\Infrastructure\Controller\ArtistController:
         arguments:
-            - '@App\Core\Domain\Repository\ArtistRepositoryInterface'
+            - '@App\Core\Domain\Repository\Artist\ArtistRepositoryInterface'
             - '%api.max_limit_value%'
     App\Core\Infrastructure\Controller\AlbumController:
         arguments:

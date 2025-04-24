@@ -3,7 +3,7 @@
 namespace App\Core\Infrastructure\Controller;
 
 use App\Core\Domain\Exception\ArtistNotFoundException;
-use App\Core\Domain\Repository\ArtistRepositoryInterface;
+use App\Core\Domain\Repository\Artist\ArtistRepositoryInterface;
 use App\Shared\Domain\ValueObject\Pagination;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
