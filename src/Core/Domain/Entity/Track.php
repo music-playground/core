@@ -39,6 +39,11 @@ class Track
         return $this->source;
     }
 
+    public function getAlbumId(): string
+    {
+        return $this->albumId;
+    }
+
     public function setName(string $name): void
     {
         $this->name = $name;

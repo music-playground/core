@@ -1013,12 +1013,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:music-playground/contracts.git",
-                "reference": "01640add97da9ec83c6b35c08bc40bcea0c5ebbd"
+                "reference": "c25db82ce6a5ffd5f69ed61da485be4db6d779d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/music-playground/contracts/zipball/01640add97da9ec83c6b35c08bc40bcea0c5ebbd",
-                "reference": "01640add97da9ec83c6b35c08bc40bcea0c5ebbd",
+                "url": "https://api.github.com/repos/music-playground/contracts/zipball/c25db82ce6a5ffd5f69ed61da485be4db6d779d4",
+                "reference": "c25db82ce6a5ffd5f69ed61da485be4db6d779d4",
                 "shasum": ""
             },
             "default-branch": true,
@@ -1039,7 +1039,7 @@
                 "source": "https://github.com/music-playground/contracts/tree/main",
                 "issues": "https://github.com/music-playground/contracts/issues"
             },
-            "time": "2025-04-24T19:06:53+00:00"
+            "time": "2025-04-25T17:47:44+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",

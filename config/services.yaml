@@ -32,6 +32,10 @@ services:
                     delivery_mode: 2
                     headers:
                         requeue: true
+                MusicPlayground\Contract\Application\SongParser\Command\OnUpdateTrackCommand:
+                    delivery_mode: 2
+                    headers:
+                        requeue: true
     exchange_stamp_middleware:
         class: 'MusicPlayground\AmqpTransport\Messenger\Middleware\AmqpExchangeStampMiddleware'
         arguments:
@@ -39,6 +43,7 @@ services:
                 MusicPlayground\Contract\Application\SongParser\Command\OnUpdateArtistCommand: 'artists.on_update'
                 MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumCommand: 'albums.on_update'
                 MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumFullCommand: 'albums.on_update_full'
+                MusicPlayground\Contract\Application\SongParser\Command\OnUpdateTrackCommand: 'tracks.on_update'
 
     App\Core\Infrastructure\Controller\ArtistController:
         arguments:

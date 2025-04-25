@@ -37,14 +37,13 @@ final readonly class AlbumSerializer
      * @param string[] $tracks
      * @param ArtistCast[] $artists
      */
-    public function toFullDto(Album $album, array $tracks, array $artists): FullAlbumDTO
+    public function toFullDto(Album $album, array $artists): FullAlbumDTO
     {
         return new FullAlbumDTO(
             $album->getId(),
             $album->getName(),
             $album->getGenres(),
             $album->getCoverId(),
-            $tracks,
             array_map(fn (ArtistCast $artist) => new PreviewArtistDTO($artist->name, $artist->avatar), $artists)
         );
     }

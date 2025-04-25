@@ -2,7 +2,6 @@
 
 namespace App\Core\Application\Handler;
 
-use App\Core\Application\Event\OnUpdateAlbumEvent;
 use App\Core\Application\Serializer\AlbumSerializer;
 use App\Core\Application\Serializer\ArtistSerializer;
 use App\Core\Domain\Entity\Album;
@@ -40,7 +39,6 @@ final readonly class UpdateAlbumCommandHandler
         }
 
         $this->flusher->flush();
-        $this->eventDispatcher->dispatch(new OnUpdateAlbumEvent($album));
     }
 
     private function updateAlbum(Album $album, UpdateAlbumCommand $command): void
