@@ -20,7 +20,7 @@ trait SimpleArtistsTrait
     /** @var SimpleArtist[] $artists */
     public function setSimpleArtists(array $artists): void
     {
-        $this->artists = new ArrayCollection($artists);
+        $this->artists = new ArrayCollection([]);
         $ids = array_map(fn (SimpleArtist $artist) => $artist->getSource()->getId(), $artists);
 
         if (array_unique($ids) !== $ids) {

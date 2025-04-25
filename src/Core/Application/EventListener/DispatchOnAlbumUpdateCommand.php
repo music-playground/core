@@ -8,7 +8,7 @@ use App\Shared\Application\Interface\CommandBusInterface;
 use MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumCommand;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-#[AsEventListener(event: OnUpdateAlbumEvent::class, method: 'dispatch')]
+#[AsEventListener(event: OnUpdateAlbumEvent::class, method: '__invoke')]
 final readonly class DispatchOnAlbumUpdateCommand
 {
     public function __construct(
@@ -17,7 +17,7 @@ final readonly class DispatchOnAlbumUpdateCommand
     ) {
     }
 
-    public function dispatch(OnUpdateAlbumEvent $event): void
+    public function __invoke(OnUpdateAlbumEvent $event): void
     {
         $this->bus->dispatch(new OnUpdateAlbumCommand(
             $event->album->getId(),

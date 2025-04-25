@@ -21,7 +21,7 @@ class ShortArtistsFactory
             return new ArtistShortCast(
                 $artist['name'],
                 $artist['_id'] ?? null,
-                $artist['avatarId'] ? new ArtistAvatar($artist['avatarId']) : null);
+                isset($artist['avatarId']) ? new ArtistAvatar($artist['avatarId']) : null);
         },  $all);
     }
 }

@@ -13,7 +13,7 @@ use App\Shared\Domain\ValueObject\Pagination;
 use MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumFullCommand;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-#[AsEventListener(event: OnUpdateAlbumEvent::class, method: 'dispatch')]
+#[AsEventListener(event: OnUpdateAlbumEvent::class, method: '__invoke')]
 final readonly class DispatchOnAlbumUpdateFullCommand
 {
     public function __construct(
@@ -24,7 +24,7 @@ final readonly class DispatchOnAlbumUpdateFullCommand
     ) {
     }
 
-    public function dispatch(OnUpdateAlbumEvent $event): void
+    public function __invoke(OnUpdateAlbumEvent $event): void
     {
         try {
             $album = $event->album;

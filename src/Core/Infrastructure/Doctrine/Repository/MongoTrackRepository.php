@@ -172,7 +172,7 @@ final readonly class MongoTrackRepository implements TrackRepositoryInterface
                 fn (array $artist) => new ArtistShortCast(
                     $artist['_id'],
                     $artist['name'],
-                    $artist['avatarId'] ? new ArtistAvatar($artist['avatarId']) : null
+                    isset($artist['avatarId']) ? new ArtistAvatar($artist['avatarId']) : null
                 ),
                 $params['artists']
             ),
