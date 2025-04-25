@@ -35,8 +35,6 @@ final readonly class UpdateTrackCommandHandler
         }
 
         $this->flusher->flush();
-
-        throw new \Exception();
     }
 
     private function updateTrack(Track $track, UpdateTrackCommand $command): void

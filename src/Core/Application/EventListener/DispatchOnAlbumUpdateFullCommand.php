@@ -2,6 +2,7 @@
 
 namespace App\Core\Application\EventListener;
 
+use App\Core\Application\Event\DomainInsertEvent;
 use App\Core\Application\Event\DomainUpdateEvent;
 use App\Core\Application\Serializer\AlbumSerializer;
 use App\Core\Domain\Entity\Album;
@@ -13,7 +14,8 @@ use App\Shared\Domain\ValueObject\Pagination;
 use MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumFullCommand;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-#[AsEventListener(event: DomainUpdateEvent::class, method: '__invoke')]
+#[AsEventListener(event: DomainInsertEvent::class, method: 'onInsert')]
+#[AsEventListener(event: DomainUpdateEvent::class, method: 'onUpdate')]
 final readonly class DispatchOnAlbumUpdateFullCommand
 {
     public function __construct(
@@ -23,10 +25,18 @@ final readonly class DispatchOnAlbumUpdateFullCommand
     ) {
     }
 
-    public function __invoke(DomainUpdateEvent $event): void
+    public function onInsert(DomainInsertEvent $event): void
     {
-        $album = $event->entity;
+        $this->dispatch($event->entity);
+    }
 
+    public function onUpdate(DomainUpdateEvent $event): void
+    {
+        $this->dispatch($event->entity);
+    }
+
+    private function dispatch(object $album): void
+    {
         if ($album instanceof Album === false) {
             return;
         }

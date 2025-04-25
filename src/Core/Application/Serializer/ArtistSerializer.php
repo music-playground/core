@@ -26,6 +26,11 @@ class ArtistSerializer
         return new IdSource($dto->id, Source::from($dto->name));
     }
 
+    public function sourceToDTO(IdSource $source): ArtistSourceDTO
+    {
+        return new ArtistSourceDTO($source->getName(), $source->getId());
+    }
+
     public function simpleFromDTO(SimpleArtistDTO $dto): SimpleArtist
     {
         return new SimpleArtist($dto->name, new IdSource($dto->source->id, Source::from($dto->source->name)));
