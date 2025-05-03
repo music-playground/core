@@ -6,11 +6,8 @@ use App\Core\Application\Event\DomainInsertEvent;
 use App\Core\Application\Event\DomainUpdateEvent;
 use App\Core\Application\Serializer\AlbumSerializer;
 use App\Core\Domain\Entity\Album;
-use App\Core\Domain\Entity\SimpleArtist;
 use App\Core\Domain\Repository\Artist\ArtistRepositoryInterface;
-use App\Core\Domain\Repository\Artist\SearchParams;
 use App\Shared\Application\Interface\CommandBusInterface;
-use App\Shared\Domain\ValueObject\Pagination;
 use MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumFullCommand;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
@@ -41,11 +38,8 @@ final readonly class DispatchOnAlbumUpdateFullCommand
             return;
         }
 
-        $simpleArtists = $album->getSimpleArtists();
-        $artists = $this->artistRepository->getCastAll(
-            new Pagination(count($simpleArtists), 0),
-            new SearchParams(array_map(fn(SimpleArtist $artist) => $artist->getSource(), $simpleArtists))
-        );
+        $allArtists = $album->getSimpleArtists();
+        $artists = $this->artistRepository->concat($allArtists);
 
         $this->bus->dispatch(new OnUpdateAlbumFullCommand(
             $this->serializer->toFullDto($album, $artists)

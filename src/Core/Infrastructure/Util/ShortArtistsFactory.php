@@ -18,6 +18,7 @@ class ShortArtistsFactory
 
         return array_map(function (array $artist) use ($existingMap) {
             $artist = $existingMap[$artist['source']] ?? $artist;
+
             return new ArtistShortCast(
                 $artist['name'],
                 $artist['_id'] ?? null,

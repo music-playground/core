@@ -4,11 +4,13 @@ namespace App\Core\Infrastructure\Doctrine\Repository;
 
 use App\Core\Domain\Entity\Artist;
 use App\Core\Domain\Entity\ArtistCast;
+use App\Core\Domain\Entity\SimpleArtist;
 use App\Core\Domain\Exception\ArtistNotFoundException;
 use App\Core\Domain\Repository\Artist\ArtistRepositoryInterface;
 use App\Core\Domain\Repository\Artist\SearchParams;
 use App\Core\Domain\ValueObject\ArtistAvatar;
 use App\Core\Domain\ValueObject\IdSource;
+use App\Core\Infrastructure\Util\PreviewArtistsFactory;
 use App\Shared\Domain\Repository\LockMode;
 use App\Shared\Domain\ValueObject\Pagination;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -21,8 +23,10 @@ final readonly class MongoArtistRepository implements ArtistRepositoryInterface
 {
     private DocumentRepository $repository;
 
-    public function __construct(private DocumentManager $dm)
-    {
+    public function __construct(
+        private DocumentManager $dm,
+        private PreviewArtistsFactory $previewArtistsFactory,
+    ) {
         $this->repository = $this->dm->getRepository(Artist::class);
     }
 
@@ -88,6 +92,17 @@ final readonly class MongoArtistRepository implements ArtistRepositoryInterface
     public function count(): int
     {
         return $this->repository->createQueryBuilder()->find()->count()->getQuery()->execute();
+    }
+
+    public function concat(array $artists): array
+    {
+        $sources = array_map(fn (SimpleArtist $artist) => $artist->getSource(), $artists);
+
+        $existingArtists = $this->repository->findBy([
+            'source' => ['$in' => $sources]
+        ]);
+
+        return $this->previewArtistsFactory->create($artists, $existingArtists);
     }
 
     /**

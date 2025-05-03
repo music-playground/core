@@ -3,8 +3,11 @@
 namespace App\Core\Application\Handler;
 
 use App\Core\Application\Serializer\ArtistSerializer;
+use App\Core\Domain\Repository\Album\AlbumRepositoryInterface;
 use App\Core\Domain\Repository\Artist\ArtistRepositoryInterface;
+use App\Shared\Application\Interface\CommandBusInterface;
 use App\Shared\Domain\FlusherInterface;
+use MusicPlayground\Contract\Application\SongParser\Command\OnUpdateArtistCommand;
 use MusicPlayground\Contract\Application\SongParser\Command\UpdateArtistCommand;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -13,8 +16,10 @@ final readonly class UpdateArtistCommandHandler
 {
     public function __construct(
         private ArtistRepositoryInterface $repository,
+        private AlbumRepositoryInterface $albumRepository,
         private FlusherInterface $flusher,
-        private ArtistSerializer $serializer
+        private ArtistSerializer $serializer,
+        private CommandBusInterface $bus
     ) {
     }
 
@@ -36,5 +41,10 @@ final readonly class UpdateArtistCommandHandler
         }
 
         $this->flusher->flush();
+
+        $this->bus->dispatch(new OnUpdateArtistCommand(
+            $this->serializer->sourceToDTO($artist->getSource()),
+            $this->albumRepository->findIdsByAuthor($artist->getId())
+        ));
     }
 }

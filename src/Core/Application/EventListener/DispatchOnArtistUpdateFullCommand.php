@@ -8,12 +8,12 @@ use App\Core\Application\Serializer\ArtistSerializer;
 use App\Core\Domain\Entity\Artist;
 use App\Core\Domain\Repository\Album\AlbumRepositoryInterface;
 use App\Shared\Application\Interface\CommandBusInterface;
-use MusicPlayground\Contract\Application\SongParser\Command\OnUpdateArtistCommand;
+use MusicPlayground\Contract\Application\SongParser\Command\OnUpdateArtistFullCommand;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 #[AsEventListener(event: DomainInsertEvent::class, method: 'onInsert')]
 #[AsEventListener(event: DomainUpdateEvent::class, method: 'onUpdate')]
-final readonly class DispatchOnArtistUpdateCommand
+final readonly class DispatchOnArtistUpdateFullCommand
 {
     public function __construct(
         private AlbumRepositoryInterface $albumRepository,
@@ -40,8 +40,9 @@ final readonly class DispatchOnArtistUpdateCommand
 
         $containsAlbums = $this->albumRepository->findIdsByAuthor($artist->getId());
 
-        $this->bus->dispatch(new OnUpdateArtistCommand(
-            $this->serializer->sourceToDTO($artist->getSource()),
+        $this->bus->dispatch(new OnUpdateArtistFullCommand(
+            $artist->getId(),
+            $this->serializer->toDto($artist),
             $containsAlbums
         ));
     }

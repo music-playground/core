@@ -4,6 +4,8 @@ namespace App\Core\Application\Serializer;
 
 use App\Core\Domain\Entity\Album;
 use App\Core\Domain\Entity\ArtistCast;
+use App\Core\Domain\Entity\ArtistShortCast;
+use App\Core\Domain\Entity\PreviewArtistCast;
 use App\Core\Domain\Enum\Source;
 use App\Core\Domain\ValueObject\IdSource;
 use MusicPlayground\Contract\Application\SongParser\DTO\AlbumDTO;
@@ -34,8 +36,7 @@ final readonly class AlbumSerializer
     }
 
     /**
-     * @param string[] $tracks
-     * @param ArtistCast[] $artists
+     * @param PreviewArtistCast[] $artists
      */
     public function toFullDto(Album $album, array $artists): FullAlbumDTO
     {
@@ -44,7 +45,7 @@ final readonly class AlbumSerializer
             $album->getName(),
             $album->getGenres(),
             $album->getCoverId(),
-            array_map(fn (ArtistCast $artist) => new PreviewArtistDTO($artist->name, $artist->avatar), $artists)
+            $this->artistSerializer->manyPreviewCastToDTO($artists)
         );
     }
 
