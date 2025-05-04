@@ -25,3 +25,4 @@ framework:
             MusicPlayground\Contract\Application\SongParser\Command\UpdateTrackCommand: amqp
             MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumFullCommand: amqp
             MusicPlayground\Contract\Application\SongParser\Command\OnUpdateTrackCommand: amqp
+            MusicPlayground\Contract\Application\SongParser\Command\ParsePlaylistCommand: amqp
