@@ -1,0 +1,19 @@
+<doctrine-mongo-mapping xmlns="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping
+                    http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd"
+>
+    <document name="App\Core\Domain\Entity\Playlist" db="core" collection="playlists">
+        <id />
+        <field field-name="name" type="string" />
+        <field field-name="source" type="id_source" />
+        <field field-name="creationOperationId" type="string" />
+        <field field-name="coverId" type="string" nullable="true" />
+        <field field-name="description" type="string" nullable="true" />
+        <indexes>
+            <index unique="true">
+                <key name="source" />
+            </index>
+        </indexes>
+    </document>
+</doctrine-mongo-mapping>
