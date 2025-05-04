@@ -19,4 +19,15 @@ final readonly class CommandBusAdapter implements CommandBusInterface
     {
         $this->commandBus->dispatch($command);
     }
+
+    /**
+     * @param object[] $commands
+     * @throws ExceptionInterface
+     */
+    public function dispatchMany(array $commands): void
+    {
+        foreach ($commands as $command) {
+            $this->commandBus->dispatch($command);
+        }
+    }
 }
