@@ -22,7 +22,7 @@ final readonly class AmqpTransportFactory implements TransportFactoryInterface
 
         return new AmqpTransport(
             new AmqpReceiver(new AmqpChannelFactory($credentials)),
-            new AmqpSender(new Publisher(), new AmqpExchangeFactory(new AmqpChannelFactory($credentials)))
+            new AmqpSender(new Publisher(), new AmqpExchangeFactory(new AmqpChannelFactory($credentials)), $serializer)
         );
     }
 
