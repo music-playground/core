@@ -80,6 +80,8 @@ final readonly class MongoTrackRepository implements TrackRepositoryInterface
         return $this->createCastByArray($albums[0]);
     }
 
+
+
     /** @return TrackCast[] */
     public function getCastAll(Pagination $pagination, ?SearchParams $params = null): array
     {
@@ -102,6 +104,22 @@ final readonly class MongoTrackRepository implements TrackRepositoryInterface
         $tracks = $aggregation->getAggregation()->execute()->toArray();
 
         return array_map(fn (array $track) => $this->createCastByArray($track), $tracks);
+    }
+
+    /**
+     * @throws MongoDBException
+     */
+    public function getAllIdsByAlbum(string $albumId): array
+    {
+        $builder = $this->repository->createQueryBuilder();
+
+        return $builder->find(Track::class)
+            ->field('albumId')
+            ->equals($albumId)
+            ->select('_id')
+            ->getQuery()
+            ->execute()
+            ->toArray();
     }
 
     /**
@@ -133,6 +151,22 @@ final readonly class MongoTrackRepository implements TrackRepositoryInterface
         }
 
         return $query->count()->getQuery()->execute();
+    }
+
+    /**
+     * @throws MongoDBException
+     */
+    public function findIdWithSource(IdSource $source): ?string
+    {
+        $response = $this->repository->createQueryBuilder()
+            ->select('_id')
+            ->field('source')
+                ->equals($source)
+            ->getQuery()
+            ->execute()
+            ->toArray();
+
+        return $response[0]['_id'] ?? null;
     }
 
     /**

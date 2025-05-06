@@ -4,9 +4,13 @@ namespace App\Core\Application\Handler;
 
 use App\Core\Application\Serializer\AlbumSerializer;
 use App\Core\Application\Serializer\ArtistSerializer;
+use App\Core\Application\Updater\AlbumUpdater;
 use App\Core\Domain\Entity\Album;
 use App\Core\Domain\Repository\Album\AlbumRepositoryInterface;
+use App\Core\Domain\Repository\Track\TrackRepositoryInterface;
+use App\Shared\Application\Interface\CommandBusInterface;
 use App\Shared\Domain\FlusherInterface;
+use MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumCommand;
 use MusicPlayground\Contract\Application\SongParser\Command\UpdateAlbumCommand;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -14,39 +18,21 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final readonly class UpdateAlbumCommandHandler
 {
     public function __construct(
-        private AlbumRepositoryInterface $repository,
-        private FlusherInterface $flusher,
-        private AlbumSerializer $serializer,
-        private ArtistSerializer $artistSerializer
+        private TrackRepositoryInterface $trackRepository,
+        private AlbumUpdater $updater,
+        private CommandBusInterface $bus
     ) {
     }
 
     public function __invoke(UpdateAlbumCommand $command): void
     {
         $albumData = $command->dto;
-        $album = $this->repository->findBySource(
-            $this->serializer->sourceFromDTO($albumData->source)
-        );
+        $album = $this->updater->fromDto($albumData);
 
-        if ($album !== null) {
-            $this->updateAlbum($album, $command);
-        } else {
-            $album = $this->serializer->fromDTO($albumData);
-
-            $this->repository->save($album);
-        }
-
-        $this->flusher->flush();
-    }
-
-    private function updateAlbum(Album $album, UpdateAlbumCommand $command): void
-    {
-        $albumData = $command->dto;
-
-        $album->setName($albumData->name);
-        $album->setCoverId($albumData->cover);
-        $album->setGenres($albumData->genres);
-        $album->setSimpleArtists($this->artistSerializer->manySimpleFroDTO($albumData->artists));
-        $album->setReleaseDate($albumData->releaseDate);
+        $this->bus->dispatch(new OnUpdateAlbumCommand(
+            $album->getId(),
+            $albumData->source,
+            $this->trackRepository->getAllIdsByAlbum($album->getId())
+        ));
     }
 }

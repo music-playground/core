@@ -24,9 +24,14 @@ interface TrackRepositoryInterface
     public function getCastAll(Pagination $pagination, ?SearchParams $params = null): array;
 
     /** @return string[] */
+    public function getAllIdsByAlbum(string $albumId): array;
+
+    /** @return string[] */
     public function getAllNamesByAlbumId(string $albumId): array;
 
     public function count(?SearchParams $searchParams = null): int;
+
+    public function findIdWithSource(IdSource $source): ?string;
 
     /**
      * @throws TrackNotFoundException

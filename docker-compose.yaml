@@ -49,7 +49,6 @@ services:
       - 8000:8000
     entrypoint: ["php", "-S", "0.0.0.0:8000", "-t", "public"]
   core-worker-1:
-    restart: always
     profiles:
       - workers
     extends:
@@ -62,7 +61,6 @@ services:
       --queues=playlists.create.1
       --bus=handle.bus -vv -f 10 --time-limit=300
   core-worker-2:
-    restart: always
     profiles:
       - workers
     extends:
@@ -75,7 +73,6 @@ services:
       --queues=playlists.create.1
       --bus=handle.bus -vv -f 10 --time-limit=300
   core-worker-3:
-    restart: always
     profiles:
       - workers
     extends:
@@ -88,7 +85,6 @@ services:
       --queues=playlists.create.1
       --bus=handle.bus -vv -f 10 --time-limit=300
   core-worker-4:
-    restart: always
     profiles:
       - workers
     extends:

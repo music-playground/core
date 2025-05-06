@@ -30,7 +30,7 @@ final readonly class CretePlaylistCommandHandler
         if ($creationOperationId !== null && $creationOperationId !== $command->operationId) {
             $this->bus->dispatch(
                 new OperationNotificationsCommand(
-                    '#', 'This playlist is already imported', 415
+                    $command->operationId, 'This playlist is already imported', 415
                 )
             );
 
@@ -44,7 +44,7 @@ final readonly class CretePlaylistCommandHandler
                 $command->operationId, $playlist->getId(), $command->playlist->source
             ),
             new OperationNotificationsCommand(
-               '#', 'Playlist import started', 421
+                $command->operationId, 'Playlist import started', 421
             )
         ]);
     }
