@@ -6,6 +6,7 @@ use App\Core\Domain\ValueObject\AlbumCover;
 use App\Core\Domain\ValueObject\ArtistAvatar;
 use App\Core\Domain\ValueObject\Audio;
 use App\Core\Domain\ValueObject\FileId;
+use App\Core\Domain\ValueObject\PlaylistCover;
 use InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -14,7 +15,8 @@ final readonly class FileIdNormalizer implements NormalizerInterface
     public const DOMAIN_MAPPING = [
         ArtistAvatar::class => 'artist-avatar',
         AlbumCover::class => 'album-cover',
-        Audio::class => 'track'
+        Audio::class => 'track',
+        PlaylistCover::class => 'playlist-cover'
     ];
 
     public function __construct(private string $host) {

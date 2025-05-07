@@ -80,6 +80,9 @@ services:
         arguments:
             - '@App\Core\Domain\Repository\Track\TrackRepositoryInterface'
             - '%api.max_limit_value%'
+    App\Core\Infrastructure\Controller\PlaylistController:
+        arguments:
+            $maxLimitValue: '%api.max_limit_value%'
 
     App\Core\Infrastructure\Normalizer\FileIdNormalizer:
         arguments:
