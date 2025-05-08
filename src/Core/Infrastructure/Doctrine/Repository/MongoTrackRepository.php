@@ -13,6 +13,7 @@ use App\Core\Domain\ValueObject\AlbumCover;
 use App\Core\Domain\ValueObject\ArtistAvatar;
 use App\Core\Domain\ValueObject\Audio;
 use App\Core\Domain\ValueObject\IdSource;
+use App\Core\Infrastructure\Util\ShortArtistsFactory;
 use App\Shared\Domain\Repository\LockMode;
 use App\Shared\Domain\ValueObject\Pagination;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
@@ -27,8 +28,10 @@ final readonly class MongoTrackRepository implements TrackRepositoryInterface
 {
     private DocumentRepository $repository;
 
-    public function __construct(private DocumentManager $dm)
-    {
+    public function __construct(
+        private DocumentManager $dm,
+        private ShortArtistsFactory $shortArtistsFactory
+    ) {
         $this->repository = $this->dm->getRepository(Track::class);
     }
 
@@ -202,14 +205,7 @@ final readonly class MongoTrackRepository implements TrackRepositoryInterface
             $params['name'],
             new Audio($params['fileId']),
             $params['source'],
-            array_map(
-                fn (array $artist) => new ArtistShortCast(
-                    $artist['_id'],
-                    $artist['name'],
-                    isset($artist['avatarId']) ? new ArtistAvatar($artist['avatarId']) : null
-                ),
-                $params['artists']
-            ),
+            $this->shortArtistsFactory->create($params['artists'], $params['existingArtists']),
             $this->createAlbumShortCastByArray($params['album'][0])
         );
     }
@@ -219,7 +215,7 @@ final readonly class MongoTrackRepository implements TrackRepositoryInterface
         $builder->lookup('artists')
             ->localField('artists.source')
             ->foreignField('source')
-            ->alias('artists');
+            ->alias('existingArtists');
     }
 
     private function pushAlbumLookup(Builder $builder): void
