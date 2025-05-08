@@ -10,6 +10,7 @@
         <field field-name="creationOperationId" type="string" />
         <field field-name="coverId" type="string" nullable="true" />
         <field field-name="description" type="string" nullable="true" />
+        <field field-name="tracks" type="collection" />
         <indexes>
             <index unique="true">
                 <key name="source" />
