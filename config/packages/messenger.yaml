@@ -38,3 +38,4 @@ framework:
             MusicPlayground\Contract\Application\Playlist\Command\OnCreatedPlaylistCommand: amqp
             MusicPlayground\Contract\Application\Operation\OperationNotificationsCommand: amqp_json
             MusicPlayground\Contract\Application\SongParser\Command\ParseTrackForPlaylistCommand: amqp
+            MusicPlayground\Contract\Application\Playlist\Command\UpdateFullPlaylistCommand: amqp

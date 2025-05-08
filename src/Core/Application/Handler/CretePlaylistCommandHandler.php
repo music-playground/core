@@ -24,10 +24,11 @@ final readonly class CretePlaylistCommandHandler
 
     public function __invoke(CreatePlaylistCommand $command): void
     {
-        $playlist = $this->serializer->fromDTO($command->playlist, $command->operationId);
-        $creationOperationId = $this->repository->findCreationOperationId($playlist->getSource());
+        $playlist = $this->repository->findBySource(
+            $this->serializer->sourceFromDTO($command->playlist->source)
+        );
 
-        if ($creationOperationId !== null && $creationOperationId !== $command->operationId) {
+        if ($playlist !== null && $playlist->getCreationOperationId() !== $command->operationId) {
             $this->bus->dispatch(
                 new OperationNotificationsCommand(
                     $command->operationId, 'This playlist is already imported', 415
@@ -37,8 +38,11 @@ final readonly class CretePlaylistCommandHandler
             return;
         }
 
-        $this->repository->save($playlist);
+        $this->repository->save(
+            $playlist ?: $this->serializer->fromDTO($command->playlist, $command->operationId)
+        );
         $this->flusher->flush();
+
         $this->bus->dispatchMany([
             new OnCreatedPlaylistCommand(
                 $command->operationId, $playlist->getId(), $command->playlist->source

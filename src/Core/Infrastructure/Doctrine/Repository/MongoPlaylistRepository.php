@@ -10,6 +10,7 @@ use App\Core\Domain\Repository\Playlist\SearchParams;
 use App\Core\Domain\ValueObject\Audio;
 use App\Core\Domain\ValueObject\IdSource;
 use App\Core\Domain\ValueObject\PlaylistCover;
+use App\Shared\Domain\Repository\LockMode;
 use App\Shared\Domain\ValueObject\Pagination;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\MatchStage;
@@ -32,7 +33,7 @@ final readonly class MongoPlaylistRepository implements PlaylistRepositoryInterf
      * @throws MappingException
      * @throws LockException
      */
-    public function findById(string $id): ?Playlist
+    public function findById(string $id, LockMode $lock = LockMode::NONE): ?Playlist
     {
         return $this->repository->find($id);
     }
@@ -42,21 +43,9 @@ final readonly class MongoPlaylistRepository implements PlaylistRepositoryInterf
         $this->dm->persist($playlist);
     }
 
-    /**
-     * @throws MongoDBException
-     */
-    public function findCreationOperationId(IdSource $source): ?string
+    public function findBySource(IdSource $source): ?Playlist
     {
-        $response = $this->repository->createQueryBuilder()
-                ->field('source')
-                    ->equals($source)
-                ->select('creationOperationId')
-                ->hydrate(false)
-                ->getQuery()
-                ->execute()
-                ->toArray();
-
-        return $response[0]['creationOperationId'] ?? null;
+        return $this->repository->findOneBy(['source' => $source]);
     }
 
     /**

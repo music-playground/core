@@ -3,13 +3,11 @@
 namespace App\Core\Domain\Entity;
 
 use App\Core\Domain\ValueObject\IdSource;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
 class Playlist
 {
     private ?string $id = null;
-    private Collection $tracks;
+    private readonly array $tracks;
 
     public function __construct(
         private string $name,
@@ -18,7 +16,7 @@ class Playlist
         private ?string $coverId,
         private ?string $description,
     ) {
-        $this->tracks = new ArrayCollection();
+        $this->tracks = [];
     }
 
     public function getId(): ?string
@@ -66,10 +64,8 @@ class Playlist
         return $this->creationOperationId;
     }
 
-    public function addTrack(string $trackId): void
+    public function getTracks(): array
     {
-        if ($this->tracks->contains($trackId) === false) {
-            $this->tracks->add($trackId);
-        }
+        return $this->tracks;
     }
 }

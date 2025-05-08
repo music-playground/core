@@ -8,6 +8,7 @@ use App\Shared\Application\Interface\CommandBusInterface;
 use MusicPlayground\Contract\Application\Operation\OperationNotificationsCommand;
 use MusicPlayground\Contract\Application\SongParser\Command\UpdateTrackForPlaylistCommand;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Throwable;
 
 #[AsMessageHandler]
 final readonly class UpdateTrackForPlaylistCommandHandler
