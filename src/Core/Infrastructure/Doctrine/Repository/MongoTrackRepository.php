@@ -3,14 +3,12 @@
 namespace App\Core\Infrastructure\Doctrine\Repository;
 
 use App\Core\Domain\Entity\AlbumShortCast;
-use App\Core\Domain\Entity\ArtistShortCast;
 use App\Core\Domain\Entity\Track;
 use App\Core\Domain\Entity\TrackCast;
 use App\Core\Domain\Exception\TrackNotFoundException;
 use App\Core\Domain\Repository\Track\SearchParams;
 use App\Core\Domain\Repository\Track\TrackRepositoryInterface;
 use App\Core\Domain\ValueObject\AlbumCover;
-use App\Core\Domain\ValueObject\ArtistAvatar;
 use App\Core\Domain\ValueObject\Audio;
 use App\Core\Domain\ValueObject\IdSource;
 use App\Core\Infrastructure\Util\ShortArtistsFactory;
@@ -116,13 +114,16 @@ final readonly class MongoTrackRepository implements TrackRepositoryInterface
     {
         $builder = $this->repository->createQueryBuilder();
 
-        return $builder->find(Track::class)
+        $response = $builder->find(Track::class)
             ->field('albumId')
             ->equals($albumId)
             ->select('_id')
+            ->hydrate(false)
             ->getQuery()
             ->execute()
             ->toArray();
+
+        return array_map(fn (array $doc) => (string)$doc['_id'], $response);
     }
 
     /**
