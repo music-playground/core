@@ -2,14 +2,9 @@
 
 namespace App\Core\Application\Handler;
 
-use App\Core\Application\Serializer\AlbumSerializer;
-use App\Core\Application\Serializer\ArtistSerializer;
 use App\Core\Application\Updater\AlbumUpdater;
-use App\Core\Domain\Entity\Album;
-use App\Core\Domain\Repository\Album\AlbumRepositoryInterface;
 use App\Core\Domain\Repository\Track\TrackRepositoryInterface;
 use App\Shared\Application\Interface\CommandBusInterface;
-use App\Shared\Domain\FlusherInterface;
 use MusicPlayground\Contract\Application\SongParser\Command\OnUpdateAlbumCommand;
 use MusicPlayground\Contract\Application\SongParser\Command\UpdateAlbumCommand;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
